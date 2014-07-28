@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <declare-styleable name="UIGraphView">
+       <attr name="Color" format="integer" />
+       <attr name = "StrokeWidth" format="integer" />
+       <attr name = "Alpha" format = "integer" />
+       <attr name = "AntiAlias" format = "boolean" />
+       <attr name = "Dither" format = "boolean" />
+       <attr name="StrokeCap" format="enum">
+           <enum name="ROUND" value="0"/>
+           <enum name="BUTT" value="1"/>
+           <enum name="SQUARE" value="2"/>
+       </attr>
+        <attr name="StrokeJoin" format="enum">
+           <enum name="ROUND" value="0"/>
+           <enum name="BEVEL" value="1"/>
+           <enum name="MITER" value="2"/>
+       </attr> 
+        <attr name="Paint.Style" format="enum">
+           <enum name="STROKE" value="0"/>
+           <enum name="FILL" value="1"/>
+           <enum name="FILL_AND_STROKE" value="2"/>
+       </attr>            
+   </declare-styleable>
+   <declare-styleable name="UIKnob"> 
+       <attr name="rotation" format="float" />       
+   </declare-styleable>
+   <declare-styleable name="UIKnobSwitch"> 
+       <attr name="position" format="float" />       
+   </declare-styleable>
+</resources>

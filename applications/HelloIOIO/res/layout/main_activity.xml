@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.example.ioio.bmt.com"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DADADA"
+    android:orientation="horizontal" >
+
+    <com.bmt.customviews.UIGraphView
+        android:id="@+id/uIGraphView1"
+        android:layout_width="729dp"
+        android:layout_height="253dp"
+        android:layout_margin="10dp" />
+
+    <com.bmt.customviews.UIKnobSwitch
+        android:id="@+id/uIKnobSwitch1"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="60dp" />
+
+</LinearLayout>
