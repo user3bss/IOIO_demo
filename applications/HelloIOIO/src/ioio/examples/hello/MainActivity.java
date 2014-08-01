@@ -1,433 +1,152 @@
 package ioio.examples.hello;
 
-import ioio.lib.api.AnalogInput;
-import ioio.lib.api.DigitalInput;
 import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.IOIO;
 import ioio.lib.api.IOIO.VersionType;
-import ioio.lib.api.SpiMaster;
-import ioio.lib.api.TwiMaster;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
 import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.android.IOIOActivity;
+
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
-import com.bmt.customviews.UIGraphView;
-import com.bmt.customviews.UIKnobSwitch;
-//import com.bmt.customviews.UIKnob.UIKnobListener;
-
-public class MainActivity extends IOIOActivity{	
+/**
+ * This is the main activity of the HelloIOIO example application.
+ *
+ * It displays a toggle button on the screen, which enables control of the
+ * on-board LED. This example shows a very simple usage of the IOIO, by using
+ * the {@link IOIOActivity} class. For a more advanced use case, see the
+ * HelloIOIOPower example.
+ */
+public class MainActivity extends IOIOActivity{
 	String tag = getClass().getSimpleName();
-	UIGraphView gv = null; 
-	UIKnobSwitch ks = null; 
-
-	public class _IOIOLooper extends BaseIOIOLooper {
-		String tag = getClass().getSimpleName();		
-		/** The on-board LED. */
-		private DigitalOutput led_;	
-		public AnalogPin[] analogPins = null;
-		public OutputPin[] outputPins = null;
-		public twi_proxy[] twi_proxies = null;
-		public spi_proxy _spi = null;	
-		InputPin _inputPin = null;
-		boolean input_pin9 = false;	
-		
-	class InputPin {
-		public DigitalInput ioiopind; //all pins
-		private int pin_num;
-		boolean bit = false;
-		DigitalInput.Spec.Mode pull_down = DigitalInput.Spec.Mode.PULL_DOWN;
-		DigitalInput.Spec.Mode pull_up = DigitalInput.Spec.Mode.PULL_UP;
-		DigitalInput.Spec.Mode floating = DigitalInput.Spec.Mode.FLOATING;
-		DigitalInput.Spec.Mode pinType = floating;
-		
-		InputPin(int PinNum){
-			pin_num = PinNum;
-			try {					
-					ioiopind = ioio_.openDigitalInput(PinNum, pinType);   //all pins
-				
-			} catch (ConnectionLostException e) {
-				
-			}		
-		}
-		InputPin(int PinNum, int mode){
-			pin_num = PinNum;
-			pinType = floating;
-			try {	
-				switch(mode){
-					case 0:
-						pinType = pull_up;					
-						break;
-					case 1:
-						pinType = pull_down;					
-						break;
-					case 2:
-						pinType = floating;
-						break;					
-				}
-				ioiopind = ioio_.openDigitalInput(PinNum, pinType);   //all pins			
-			} catch (ConnectionLostException e) {
-				
-			}		
-		}	
-		public boolean readBit(){
-			try {
-				bit = ioiopind.read();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ConnectionLostException e) {
-			}	
-			return bit;
-		}	
-	}
-	class OutputPin {
-		public DigitalOutput ioiopindo; //all except for 9
-		private int pin_num;
-		boolean bit = false;	
-		OutputPin(int PinNum){
-			pin_num = PinNum;
-			try {					
-				if(PinNum != 9){ //9 is input only
-					ioiopindo = ioio_.openDigitalOutput(PinNum);
-				}
-			} catch (ConnectionLostException e) {
-				
-			}		
-		}
-		OutputPin(int PinNum, int _type){
-			pin_num = PinNum;
-			try {					
-				if(PinNum != 9){ //9 is input only
-					if(_type == 3)
-						ioiopindo = ioio_.openDigitalOutput(PinNum);
-					if(_type != 3)
-						ioiopindo = ioio_.openDigitalOutput(PinNum, DigitalOutput.Spec.Mode.OPEN_DRAIN, bit);
-				}
-			} catch (ConnectionLostException e) {
-				
-			}		
-		}
-		public boolean readBit(){
-			return bit; //ioiopindo.read(); no read function for output
-		}
-		public void writeBit(boolean _bit){
-			try {
-				bit = _bit;
-				ioiopindo.write(bit);
-			} catch (ConnectionLostException e) {
-				
-			}
-		}
-	}
-
-	class AnalogPin {
-		private AnalogInput ioiopina;  //31-46
-		private int pin_num;
-		private float RefVolts = (float) 3.3;
-		
-		AnalogPin(int PinNum) {
-			pin_num = PinNum;
-			try {					
-				if(PinNum <= 46 && PinNum >= 31){	
-					ioiopina = ioio_.openAnalogInput(PinNum);
-					ioiopina.setBuffer(256);
-					float sr = ioiopina.getSampleRate();			//in Hz units.		
-					RefVolts = ioiopina.getReference();
-					Log.v(tag, "Reference Voltage: " + RefVolts+", SampleRate: "+sr);				
-				}
-				
-			} catch (ConnectionLostException e) {
-				
-			}		
-		}
-		public float readAnalogInBuffered() throws InterruptedException, ConnectionLostException{
-			float v = 0;
-			float val = 0;			
-			//printAnalogDroppedSamples(aIn0);
-			int numSampleToRead = ioiopina.available();
-			for(int i=0;i<numSampleToRead;i++){	//reads all available samples
-				v = ioiopina.getVoltageBuffered();
-				val = ioiopina.readBuffered();
-				Log.v(tag, "Voltage: "+v+", Value: "+val);				
-			}
-			return v;
-		}
-		public float readAnalogInUnBuffered() throws InterruptedException, ConnectionLostException{
-			float v = 0;
-			float val = 0;			
-			printDroppedSamples();
-			int numSampleToRead = ioiopina.available();
-			for(int i=0;i<numSampleToRead;i++){	//reads all available samples
-				v = ioiopina.getVoltage();
-				val = ioiopina.read();
-				Log.v(tag, "Voltage: "+v+", Value: "+val);
-			}
-			return v;			
-		}
-		public void setRefVolts(float volts){
-			RefVolts = (float) volts;
-			if (volts > 3.3) 
-				Log.d(tag,"RefVolts set to higher than 3.3");
-		}
-
-
-		public void printDroppedSamples() throws ConnectionLostException{
-			int droppedSamples = ioiopina.getOverflowCount();
-			if(droppedSamples > 0){
-				Log.v(tag, "DroppedSamples: "+droppedSamples);
-			}			
-		}	
-	}
-	public class twi_proxy {		
-		private TwiMaster twi;	
-		private TwiMaster.Rate twiRate = TwiMaster.Rate.RATE_100KHz;
-		private int twiNum = 1;
-		private byte[] twiResult;
-		TwiMaster.Result result;
-		boolean TenBitAddr = false;	
-		twi_proxy(int twi_num){
-			try {
-				twiNum = twi_num;
-				openTWI();
-			} catch (ConnectionLostException e) {
-				
-			}
-		}
-		public void openTWI() throws ConnectionLostException{
-			Log.d(tag, "Opening TwiNum: [1]: " + twiNum + " and TwiRate: [100k] : "+twiRate);		
-			twi = ioio_.openTwiMaster(twiNum, twiRate, false); //pass true as third argument for SMBus levels			
-		}
-		public void closeTWI(){
-			twi.close();
-			twi = null;
-		}
-		public void setTwiRate(TwiMaster.Rate r){
-			Log.d(tag, "Setting TwiRate: "+r);
-			twiRate = r;
-			closeTWI();
-			try {
-				openTWI();
-			} catch (ConnectionLostException e) {
-				
-			}
-		}
-		public byte[] twi_RW(int address, byte[] request, int responseLength, boolean async) throws InterruptedException, ConnectionLostException{
-			//twi = ioio_.openTwiMaster(twiNum, twiRate, false);
-			twiResult = new byte[responseLength];
-			if( address > 256 ) 
-				TenBitAddr = true;
-			else
-				TenBitAddr = false;
-			
-			if(async){
-				TwiMaster.Result result = twi.writeReadAsync(address , TenBitAddr, request, request.length, twiResult, twiResult.length);
-				result.waitReady();  // blocks until response is available
-			} else {
-				twi.writeRead(address, TenBitAddr, request, request.length, twiResult, twiResult.length); //smbus Level
-			}
-			//twi.close();
-			return twiResult;
-		}
-	}
-	public class spi_proxy {
-		private SpiMaster spi;
-		private SpiMaster.Rate spiRate = SpiMaster.Rate.RATE_125K;
-		int misoPin = 28;
-		int mosiPin = 29;
-		int clkPin = 30;
-		int ssPins = 27;
-		byte[] spi_result;
-		
-		spi_proxy(){
-			try {
-				openSPI();
-				spi_result = null;
-			} catch (ConnectionLostException e) {
-				
-			}
-		}
-		public void openSPI() throws ConnectionLostException{
-			Log.d(tag, "Opening SPI iso: [27]: "+ misoPin + " osi: [28]: "+mosiPin+" clk: [29]: "+clkPin+" rate: [125k] :"+spiRate);
-			//spi = ioio_.openSpiMaster(misoPin, mosiPin, clkPin, ssPins, spiRate );
-			spi = ioio_.openSpiMaster(misoPin, mosiPin, clkPin, ssPins, spiRate );			
-		}
-		public void closeSPI(){
-			spi.close();
-		}
-		public void setSpiPins(int _misoPin, int _mosiPin, int _clkPin, int _ssPins){
-			misoPin = _misoPin;  //int misoPin = 27;
-			mosiPin = _mosiPin;  //int mosiPin = 28;
-			clkPin = _clkPin;    //int clkPin = 29;
-			ssPins = _ssPins;    //int ssPins = 26;			
-		}
-		public byte[] spi_RW(int address, byte[] request, int responselength, boolean async) throws InterruptedException, ConnectionLostException{
-			//spi = ioio_.openSpiMaster(misoPin, mosiPin, clkPin, ssPins, spiRate );
-			//what's up with 7???
-			spi_result = new byte[responselength];
-			if(async){
-				SpiMaster.Result result = spi.writeReadAsync(address, request, request.length, 7, spi_result, spi_result.length);
-				result.waitReady();  // blocks until response is available						
-			} else {
-				spi.writeRead(address, request, request.length, 7, spi_result, spi_result.length);			
-			}
-			//spi.close();
-			return spi_result;
-		}		
-	}	
+	public HashMap<String, ToggleButton> ToggleButtons = null;
+	public HashMap<String, TextView> TextViews = null;
 	
 	
-	@Override
-	protected void setup() {
-		try{
-			showVersions(ioio_, "IOIO connected!");			
-			outputPins = new OutputPin[30];			
-			//outputPins[0] = new OutputPin(1);	 //this turns led off??
-			//outputPins[1] = new OutputPin(2);  //this turns led off??
-			outputPins[2] = new OutputPin(3);
-			//outputPins[3] = new OutputPin(4); //DA0
-			//outputPins[4] = new OutputPin(5); //CL0				
-			outputPins[5] = new OutputPin(6);
-			outputPins[6] = new OutputPin(7);
-			outputPins[7] = new OutputPin(8);
-			
-			outputPins[8] = new OutputPin(10);
-			outputPins[9] = new OutputPin(11);
-			outputPins[10] = new OutputPin(12);
-			outputPins[11] = new OutputPin(13);
-			outputPins[12] = new OutputPin(14);
-			outputPins[13] = new OutputPin(15);
-			outputPins[14] = new OutputPin(16);
-			outputPins[15] = new OutputPin(17);
-			
-			outputPins[16] = new OutputPin(18);
-			outputPins[17] = new OutputPin(19);
-			outputPins[18] = new OutputPin(20);
-			outputPins[19] = new OutputPin(21);
-			outputPins[20] = new OutputPin(22);
-			outputPins[21] = new OutputPin(23);
-			outputPins[22] = new OutputPin(24);
-			
-			//outputPins[23] = new OutputPin(25);	//CL2		25
-			
-			//outputPins[24] = new OutputPin(26);	//DA2       26	
-			//outputPins[25] = new OutputPin(27); //spi pins
-			//outputPins[26] = new OutputPin(28);
-			//outputPins[27] = new OutputPin(29);
-			//outputPins[28] = new OutputPin(30);
-			//OutputPin io23 = new OutputPin(47);	//DA1       47	
-			//OutputPin io24 = new OutputPin(48);	//CL1		48 
-			
-			analogPins = new AnalogPin[16];
-			analogPins[0] = new AnalogPin(31);
-			analogPins[1] = new AnalogPin(32);
-			analogPins[2] = new AnalogPin(33);
-			analogPins[3] = new AnalogPin(34);
-			analogPins[4] = new AnalogPin(35); //ref+
-			analogPins[5] = new AnalogPin(36); //ref-
-			analogPins[6] = new AnalogPin(37);
-			analogPins[7] = new AnalogPin(38);
-			
-			analogPins[8] = new AnalogPin(39);
-			analogPins[9] = new AnalogPin(40);
-			analogPins[10] = new AnalogPin(41);
-			analogPins[11] = new AnalogPin(42);
-			analogPins[12] = new AnalogPin(43);
-			analogPins[13] = new AnalogPin(44);
-			analogPins[14] = new AnalogPin(45);
-			analogPins[15] = new AnalogPin(46);	
-		
-			_spi = new spi_proxy();	
-			//_spi.setSpiPins(_misoPin, _mosiPin, _clkPin, _ssPins);
-			twi_proxies = new twi_proxy[3];
-			twi_proxies[0] = new twi_proxy(0);
-			twi_proxies[1] = new twi_proxy(1);
-			twi_proxies[2] = new twi_proxy(2);
-
-			led_ = ioio_.openDigitalOutput(0, false);			
-			_inputPin = new InputPin(9, 0); //0:pullup, 1:pulldn, 2:float
-			
-			
-		} catch (ConnectionLostException e) {
-			
-		}			
-	}
-
-	@Override
-	public void disconnected() {
-		enableUi(false);		
-		toast("IOIO disconnected");			
-		analogPins = null;
-		outputPins = null;
-		twi_proxies = null;
-		_spi = null;	
-		_inputPin = null;
-		input_pin9 = false;		
-	}		
 	
-	@Override
-	public void loop() {		
-		try {			
-			int i = 0;
-			for(i=0; i < analogPins.length;i++){
-				if(analogPins[i] != null)
-					analogPins[i].readAnalogInBuffered();
-			}				
-			for(i=0; i < outputPins.length;i++){
-				if(outputPins[i] != null)
-					outputPins[i].writeBit(false);
-			}				
-			//for(i=0; i < twi_proxies.length;i++){
-				//int address = 0;
-				//twi_proxies[i].twi_RW(address, request, responseLength, true);
-			//}
-			//_spi.spi_RW(address, request, responselength, async);
-			input_pin9 = _inputPin.readBit();			
-			Thread.sleep(50); 			 //milliseconds, = 50 samples in buffer for analog
-			
-			//How to measure latency???
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (ConnectionLostException e) {
-		}
-	}
-}
-	private int numConnected_ = 0;	
-	private void enableUi(final boolean enable) {
-		// This is slightly trickier than expected to support a multi-IOIO use-case.
-		runOnUiThread(new Runnable() {
-			
-			@Override
-			public void run() {
-				
-				if (enable) {
-					if (numConnected_++ == 0) {						
-						gv.setEnabled(true);
-						ks.setEnabled(true);
-					}
-				} else {
-					if (--numConnected_ == 0) {
-						gv.setEnabled(false);
-						ks.setEnabled(false);
-					}
-				}
-			}
-		});
-	}
-
+	/**
+	 * Called when the activity is first created. Here we normally initialize
+	 * our GUI.
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_activity);
-		ks = (UIKnobSwitch) findViewById(R.id.uIKnobSwitch1); 
-		gv = (UIGraphView) findViewById(R.id.uIGraphView1);		
-	}	
+		setContentView(R.layout.main);
+		//pin9 = new InputPin(9);
+		
+		ToggleButtons = new HashMap<String, ToggleButton>();
+		ToggleButtons.put("D0", (ToggleButton) findViewById(R.id.toggleButtonD0));
+		ToggleButtons.put("D1", (ToggleButton) findViewById(R.id.toggleButtonD1));
+		ToggleButtons.put("D2", (ToggleButton) findViewById(R.id.toggleButtonD2));
+		ToggleButtons.put("D3", (ToggleButton) findViewById(R.id.toggleButtonD3));
+	
+		ToggleButtons.put("D4", (ToggleButton) findViewById(R.id.toggleButtonD4));
+		ToggleButtons.put("D5", (ToggleButton) findViewById(R.id.toggleButtonD5));
+		ToggleButtons.put("D6", (ToggleButton) findViewById(R.id.toggleButtonD6));
+		ToggleButtons.put("D7", (ToggleButton) findViewById(R.id.toggleButtonD7));
+
+		ToggleButtons.put("D8", (ToggleButton) findViewById(R.id.toggleButtonD8));
+		ToggleButtons.put("D9", (ToggleButton) findViewById(R.id.toggleButtonD9));
+		ToggleButtons.put("D10", (ToggleButton) findViewById(R.id.toggleButtonD10));
+		ToggleButtons.put("D11", (ToggleButton) findViewById(R.id.toggleButtonD11));
+	
+		ToggleButtons.put("D12", (ToggleButton) findViewById(R.id.toggleButtonD12));
+		ToggleButtons.put("D13", (ToggleButton) findViewById(R.id.toggleButtonD13));
+		ToggleButtons.put("D14", (ToggleButton) findViewById(R.id.toggleButtonD14));
+		ToggleButtons.put("D15", (ToggleButton) findViewById(R.id.toggleButtonD15));		
+		
+		ToggleButtons.put("led", (ToggleButton) findViewById(R.id.toggleButtonLed));
+		
+		TextViews = new HashMap<String, TextView>();
+		TextViews.put("AN0", (TextView) findViewById(R.id.AN0Text));
+		TextViews.put("AN1", (TextView) findViewById(R.id.AN1Text));
+		TextViews.put("AN2", (TextView) findViewById(R.id.AN2Text));
+		TextViews.put("AN3", (TextView) findViewById(R.id.AN3Text));
+		TextViews.put("AN4", (TextView) findViewById(R.id.AN4Text));
+		TextViews.put("AN5", (TextView) findViewById(R.id.AN5Text));
+		TextViews.put("AN6", (TextView) findViewById(R.id.AN6Text));
+		TextViews.put("AN7", (TextView) findViewById(R.id.AN7Text));
+		
+		TextViews.put("AN8", (TextView) findViewById(R.id.AN8Text));
+		TextViews.put("AN9", (TextView) findViewById(R.id.AN9Text));		
+		TextViews.put("AN10", (TextView) findViewById(R.id.AN10Text));
+		TextViews.put("AN11", (TextView) findViewById(R.id.AN11Text));
+		TextViews.put("AN12", (TextView) findViewById(R.id.AN12Text));
+		TextViews.put("AN13", (TextView) findViewById(R.id.AN13Text));
+		TextViews.put("AN14", (TextView) findViewById(R.id.AN14Text));
+		TextViews.put("AN15", (TextView) findViewById(R.id.AN15Text));
+		TextViews.put("D9", (TextView) findViewById(R.id.D9Text));
+
+		for( Entry<String, ToggleButton> entry : ToggleButtons.entrySet()){
+			Log.i("key: ", entry.getKey().trim()+" , value:"+entry.getValue().getClass().getName());
+			entry.getValue().setEnabled(false);
+		}		
+
+	}
+	
+	public void setText(final String pin, final float v){
+	    this.runOnUiThread(new Runnable() {
+	        @Override
+	        public void run() {
+	            // This code will always run on the UI thread, therefore is safe to modify UI elements.
+	        	TextViews.get(pin).setText(pin+": "+v);
+	        }
+	    });		
+	}
+
+	class Looper extends BaseIOIOLooper {
+		/** The on-board LED. */
+		private DigitalOutput led_;
+		@Override
+		protected void setup() throws ConnectionLostException {
+			showVersions(ioio_, "IOIO connected!");
+			led_ = ioio_.openDigitalOutput(0, true);
+			enableUi(true);
+		}
+
+		@Override
+		public void loop() throws ConnectionLostException, InterruptedException {
+			led_.write(!ToggleButtons.get("led").isChecked());
+			
+			//float v = ioiopina.getVoltageBuffered();
+			try{				
+				//setText("AN0", v);				
+			} catch (Exception e) {
+				  toast(e.getMessage());
+			}
+			Thread.sleep(350);
+		}
+
+		@Override
+		public void disconnected() {
+			enableUi(false);		
+			toast("IOIO disconnected"); 		
+		}		
+		@Override
+		public void incompatible() {
+			showVersions(ioio_, "Incompatible firmware version!");
+		}
+}
+
+	/**
+	 * A method to create our IOIO thread.
+	 *
+	 * @see ioio.lib.util.AbstractIOIOActivity#createIOIOThread()
+	 */
+	@Override
+	protected IOIOLooper createIOIOLooper() {
+		return new Looper();
+	}
+
 	private void showVersions(IOIO ioio, String title) {
 		toast(String.format("%s\n" +
 				"IOIOLib: %s\n" +
@@ -446,13 +165,34 @@ public class MainActivity extends IOIOActivity{
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+				Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
 			}
 		});
 	}
-	
-	@Override
-	protected IOIOLooper createIOIOLooper() {
-		return new _IOIOLooper();
-	}	
+
+	private int numConnected_ = 0;
+
+	private void enableUi(final boolean enable) {
+		// This is slightly trickier than expected to support a multi-IOIO use-case.
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (enable) {
+					if (numConnected_++ == 0) {
+						//ToggleButtons.get("led").setEnabled(true);
+						for( Entry<String, ToggleButton> entry : ToggleButtons.entrySet()){
+							entry.getValue().setEnabled(true);
+						}						
+					}
+				} else {
+					if (--numConnected_ == 0) {
+						//ToggleButtons.get("led").setEnabled(false);
+						for( Entry<String, ToggleButton> entry : ToggleButtons.entrySet()){
+							entry.getValue().setEnabled(false);
+						}						
+					}
+				}
+			}
+		});
+	}
 }

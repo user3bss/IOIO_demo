@@ -1,13 +1,308 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    android:id="@+id/title"/>
-<ToggleButton android:text="ToggleButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/button" android:enabled="false"></ToggleButton>
-</LinearLayout>
+    android:orientation="vertical" >
+
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+        
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal|center" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/AN0Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN0"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN1Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN1"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN2Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN2"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN3Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN3"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN4Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN4"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN5Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN5"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN6Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN6"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN7Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN7"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/D9Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="D9"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/AN8Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN8 : 3.32345"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN9Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN9"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN10Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN10"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN11Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN11"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN12Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN12"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN13Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN13"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN14Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN14"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/AN15Text"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="AN15"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </LinearLayout>		
+	
+	</LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D0"
+                android:textOn="D0" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D1"
+                android:textOn="D1" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D2"
+                android:textOn="D2" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D3"
+                android:textOn="D3" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D4"
+                android:textOn="D4" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D5"
+                android:textOn="D5" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D6"
+                android:textOn="D6" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D7" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D8"
+                android:textOn="D8" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D9"
+                android:textOn="D9" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D10"
+                android:textOn="D10" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D11"
+                android:textOn="D11" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D12"
+                android:textOn="D12" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D13"
+                android:textOn="D13" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D14"
+                android:textOn="D14" />
+
+            <ToggleButton
+                android:id="@+id/toggleButtonD15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton"
+                android:textOff="D15"
+                android:textOn="D15" />
+        </LinearLayout>
+
+        <ToggleButton
+            android:id="@+id/toggleButtonLed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ToggleButton"
+            android:textOff="LED"
+            android:textOn="LED" />
+    </LinearLayout>
+</LinearLayout>    
+	</ScrollView>
+</LinearLayout>		   
