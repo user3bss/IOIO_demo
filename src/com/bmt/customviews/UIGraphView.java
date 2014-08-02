@@ -6,7 +6,6 @@
 
 package com.bmt.customviews;
 
-import ioio.examples.hello.R;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -17,6 +16,8 @@ import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+
+import com.bmt.ioio_demo.R;
 
 public class UIGraphView extends View {
 	private Path tiPath = null;

@@ -1,5 +1,4 @@
 package com.bmt.customviews;
-import ioio.examples.hello.R;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -18,6 +17,8 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.bmt.ioio_demo.R;
 
 public class UIKnob extends View implements OnGestureListener {
 	private Canvas ctx = null;

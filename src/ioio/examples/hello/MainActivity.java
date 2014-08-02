@@ -26,6 +26,8 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import com.bmt.ioio_demo.R;
 //import com.bmt.customviews.UIKnob.UIKnobListener;
 
 public class MainActivity extends IOIOActivity{	

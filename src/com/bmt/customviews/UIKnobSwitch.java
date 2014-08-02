@@ -1,6 +1,5 @@
 package com.bmt.customviews;
 
-import ioio.examples.hello.R;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -19,7 +18,8 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
+
+import com.bmt.ioio_demo.R;
 
 public class UIKnobSwitch extends View implements OnGestureListener {
 	private Canvas ctx = null;
