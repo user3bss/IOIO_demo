@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+
+	    <LinearLayout
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	        android:orientation="horizontal" >
+	
+	        <Button
+	            android:id="@+id/power"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="ON/OFF" />
+	
+	        <Button
+	            android:id="@+id/auto_scan"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Auto Scan" />
+	
+	    </LinearLayout>
+	
+	    <LinearLayout
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal" >
+	
+	        <Button
+	            android:id="@+id/tune_down"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="&lt;" />
+	
+	        <TextView
+	            android:id="@+id/textView1"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Tune"
+	            android:textAppearance="?android:attr/textAppearanceLarge" />
+	
+	        <Button
+	            android:id="@+id/tune_up"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text=">" />
+	    </LinearLayout>
+
+	    <TextView
+	        android:id="@+id/display_freq"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	        android:text="MHZ: 0"
+	        android:textAppearance="?android:attr/textAppearanceLarge" />
+	
+	    <LinearLayout
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	        android:orientation="horizontal" >
+	
+	        <Button
+	            android:id="@+id/channel_1"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="1" />
+	
+	        <Button
+	            android:id="@+id/channel_2"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="2" />
+	
+	        <Button
+	            android:id="@+id/channel_3"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="3" />
+	
+	    </LinearLayout>
+	
+	    <LinearLayout
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal" >
+	
+	        <Button
+	            android:id="@+id/channel_4"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="4" />
+	
+	        <Button
+	            android:id="@+id/channel_5"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="5" />
+	
+	        <Button
+	            android:id="@+id/channel_6"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="6" />
+	    </LinearLayout>
+
+	    <LinearLayout
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:gravity="center_horizontal" >
+
+	        <Button
+	            android:id="@+id/volume_down_button"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="&lt;" />
+
+	        <TextView
+	            android:id="@+id/textView2"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Volume"
+	            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+	        <Button
+	            android:id="@+id/volume_up_button"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text=">" />
+
+	    </LinearLayout>
+
+	</LinearLayout>
+
+</LinearLayout>
