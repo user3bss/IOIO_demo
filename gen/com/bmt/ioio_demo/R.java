@@ -106,11 +106,12 @@ containing a value of this type.
         public static final int dots=0x7f020000;
         public static final int ic_launcher=0x7f020001;
         public static final int icon=0x7f020002;
-        public static final int knob=0x7f020003;
-        public static final int rotoroff=0x7f020004;
-        public static final int rotoron=0x7f020005;
-        public static final int stator=0x7f020006;
-        public static final int statorswitch=0x7f020007;
+        public static final int ioio_down=0x7f020003;
+        public static final int knob=0x7f020004;
+        public static final int rotoroff=0x7f020005;
+        public static final int rotoron=0x7f020006;
+        public static final int stator=0x7f020007;
+        public static final int statorswitch=0x7f020008;
     }
     public static final class id {
         public static final int AN0Text=0x7f050019;
@@ -138,6 +139,9 @@ containing a value of this type.
         public static final int ROUND=0x7f050000;
         public static final int SQUARE=0x7f050002;
         public static final int STROKE=0x7f050005;
+        public static final int SeekBar=0x7f05003c;
+        public static final int TextView=0x7f05003d;
+        public static final int ToggleButton=0x7f05003e;
         public static final int auto_scan=0x7f050009;
         public static final int buttonScrollView=0x7f05002a;
         public static final int channel_1=0x7f05000e;
@@ -147,6 +151,7 @@ containing a value of this type.
         public static final int channel_5=0x7f050012;
         public static final int channel_6=0x7f050013;
         public static final int display_freq=0x7f05000d;
+        public static final int imageView1=0x7f05003f;
         public static final int power=0x7f050008;
         public static final int scrollView1=0x7f050018;
         public static final int textView1=0x7f05000b;
@@ -178,10 +183,13 @@ containing a value of this type.
         public static final int fm_activity=0x7f030000;
         public static final int graph_activity=0x7f030001;
         public static final int main=0x7f030002;
+        public static final int simple=0x7f030003;
     }
     public static final class string {
+        public static final int analog_label=0x7f060003;
         public static final int app_name=0x7f060000;
         public static final int hello_world=0x7f060001;
+        public static final int seekbar_label=0x7f060002;
     }
     public static final class style {
         /** 
