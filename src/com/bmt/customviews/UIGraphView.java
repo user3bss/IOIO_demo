@@ -19,101 +19,109 @@ import android.view.View;
 
 import com.bmt.ioio_demo.R;
 
+
 public class UIGraphView extends View {
 	private Path tiPath = null;
 	private Bitmap tiBitmap = null;
 	//private Bitmap tiBackground = null;
 	private Canvas tiCanvas = null;
-	private Paint tiBitmapPaint = null;
 	String tag = getClass().getSimpleName();
+	private brush defaultBrush = null;
 	
-	private void setPaintOptions() {
-		tiBitmapPaint = new Paint();
-		tiBitmapPaint.setAntiAlias(true);
-		tiBitmapPaint.setDither(true);
-		tiBitmapPaint.setColor(Color.BLACK);
-		tiBitmapPaint.setStyle(Paint.Style.STROKE);
-		tiBitmapPaint.setStrokeJoin(Paint.Join.ROUND);
-		tiBitmapPaint.setStrokeCap(Paint.Cap.ROUND);
-		tiBitmapPaint.setStrokeWidth(2);
-		tiBitmapPaint.setAlpha(255);
-		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);
-		tiPath = new Path();		
+	private class brush{
+		private Path[] _Path = null;			//store path with paint
+		private Paint _BitmapPaint = null;		
+		brush(){
+			_BitmapPaint = new Paint();
+			_BitmapPaint.setAntiAlias(true);
+			_BitmapPaint.setDither(true);
+			_BitmapPaint.setColor(Color.BLACK);
+			_BitmapPaint.setStyle(Paint.Style.STROKE);
+			_BitmapPaint.setStrokeJoin(Paint.Join.ROUND);
+			_BitmapPaint.setStrokeCap(Paint.Cap.ROUND);
+			_BitmapPaint.setStrokeWidth(2);
+			_BitmapPaint.setAlpha(255);			
+		}
+		public Path[] getPaths(){
+			return _Path;	//return the array
+		}
+		public Paint getPaint(){
+			return _BitmapPaint;
+		}
+		public void setAntiAlias(boolean AntiAlias){
+			_BitmapPaint.setAntiAlias(AntiAlias);		
+		}
+		public void setDither(boolean Dither){
+			_BitmapPaint.setDither(Dither);
+		}
+		public void setStrokeJoin(int StrokeJoin){
+			if(StrokeJoin == 0)
+				_BitmapPaint.setStrokeJoin(Paint.Join.ROUND);
+			if(StrokeJoin == 1)
+				_BitmapPaint.setStrokeJoin(Paint.Join.BEVEL);
+			if(StrokeJoin == 2)
+				_BitmapPaint.setStrokeJoin(Paint.Join.MITER);
+		}
+		public void setStrokeCap(int StrokeCap){
+			if(StrokeCap == 0)
+				_BitmapPaint.setStrokeCap(Paint.Cap.ROUND);
+			if(StrokeCap == 1)
+				_BitmapPaint.setStrokeCap(Paint.Cap.BUTT);
+			if(StrokeCap == 2)
+				_BitmapPaint.setStrokeCap(Paint.Cap.SQUARE);		
+		}
+		public void setStrokeWidth(int StrokeWidth){
+			_BitmapPaint.setStrokeWidth(StrokeWidth);
+		}
+		public void setPaintStyle(int Paint_Style){
+			if(Paint_Style == 0)
+				_BitmapPaint.setStyle(Paint.Style.STROKE);
+			if(Paint_Style == 1)
+				_BitmapPaint.setStyle(Paint.Style.FILL);
+			if(Paint_Style == 2)
+				_BitmapPaint.setStyle(Paint.Style.FILL_AND_STROKE);		
+		}
+		public void setColor(int _Color){
+			_BitmapPaint.setColor(_Color);	
+		}
+		public void setAlpha(int _Alpha){		
+			_BitmapPaint.setAlpha(_Alpha);
+		}		
 	}
-
-	public void setUIGraphView_AntiAlias(boolean AntiAlias){
-		tiBitmapPaint.setAntiAlias(AntiAlias);		
-	}
-	public void setUIGraphView_Dither(boolean Dither){
-		tiBitmapPaint.setDither(Dither);
-	}
-	public void setUIGraphView_StrokeJoin(int StrokeJoin){
-		if(StrokeJoin == 0)
-			tiBitmapPaint.setStrokeJoin(Paint.Join.ROUND);
-		if(StrokeJoin == 1)
-			tiBitmapPaint.setStrokeJoin(Paint.Join.BEVEL);
-		if(StrokeJoin == 2)
-			tiBitmapPaint.setStrokeJoin(Paint.Join.MITER);
-	}
-	public void setUIGraphView_StrokeCap(int StrokeCap){
-		if(StrokeCap == 0)
-			tiBitmapPaint.setStrokeCap(Paint.Cap.ROUND);
-		if(StrokeCap == 1)
-			tiBitmapPaint.setStrokeCap(Paint.Cap.BUTT);
-		if(StrokeCap == 2)
-			tiBitmapPaint.setStrokeCap(Paint.Cap.SQUARE);		
-	}
-	public void setUIGraphView_StrokeWidth(int StrokeWidth){
-		tiBitmapPaint.setStrokeWidth(StrokeWidth);
-	}
-	public void setUIGraphView_Paint_Style(int Paint_Style){
-		if(Paint_Style == 0)
-			tiBitmapPaint.setStyle(Paint.Style.STROKE);
-		if(Paint_Style == 1)
-			tiBitmapPaint.setStyle(Paint.Style.FILL);
-		if(Paint_Style == 2)
-			tiBitmapPaint.setStyle(Paint.Style.FILL_AND_STROKE);		
-	}
-	public void setUIGraphView_Color(int _Color){
-		tiBitmapPaint.setColor(_Color);	
-	}
-	public void setUIGraphView_Alpha(int _Alpha){		
-		tiBitmapPaint.setAlpha(_Alpha);
-	}	
-	private void setPaintOptions(Context context, AttributeSet attrs) {		
-		Log.i(tag, "using attrs");
+	
+	public void setBrush(Context context, AttributeSet attrs) {		
+		Log.i(tag, "graph view using attrs");
 			TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.UIGraphView, 0, 0);
-		   try {	       
-			   	setPaintOptions();
-				setUIGraphView_AntiAlias(a.getBoolean(R.styleable.UIGraphView_AntiAlias, false));
-				setUIGraphView_Alpha(a.getInteger(R.styleable.UIGraphView_Alpha, 255));
+		   try {
+			   	defaultBrush.setAntiAlias(a.getBoolean(R.styleable.UIGraphView_AntiAlias, false));
+			   	defaultBrush.setAlpha(a.getInteger(R.styleable.UIGraphView_Alpha, 255));
 				//setUIGraphView_Color(a.getInteger(R.styleable.UIGraphView_Color, Color.BLACK));
 				//setUIGraphView_Color( Color.parseColor( a.getString(R.styleable.UIGraphView_Color) ));
-				setUIGraphView_Dither(a.getBoolean(R.styleable.UIGraphView_Dither, true));
-				setUIGraphView_StrokeCap(a.getInteger(R.styleable.UIGraphView_StrokeCap, 0));
-				setUIGraphView_StrokeWidth(a.getInteger(R.styleable.UIGraphView_StrokeWidth, 2));
-				setUIGraphView_Paint_Style(a.getInteger(R.styleable.UIGraphView_Paint_Style, 0));
-				setUIGraphView_StrokeJoin(a.getInteger(R.styleable.UIGraphView_StrokeJoin, 0));
+			   	defaultBrush.setDither(a.getBoolean(R.styleable.UIGraphView_Dither, true));
+			   	defaultBrush.setStrokeCap(a.getInteger(R.styleable.UIGraphView_StrokeCap, 0));
+			   	defaultBrush.setStrokeWidth(a.getInteger(R.styleable.UIGraphView_StrokeWidth, 2));
+			   	defaultBrush.setPaintStyle(a.getInteger(R.styleable.UIGraphView_Paint_Style, 0));
+			   	defaultBrush.setStrokeJoin(a.getInteger(R.styleable.UIGraphView_StrokeJoin, 0));
 				
 		   } finally {
 		       a.recycle();
-		   }
-		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);
-		tiPath = new Path();		
+		   }		
 	}	
 	public UIGraphView(Context c) {
 		super(c);
-		setPaintOptions();
-		
+		defaultBrush = new brush();		
+		//setPaintOptions();
 	}
 	public UIGraphView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		setPaintOptions(context, attrs);
+		defaultBrush = new brush();		
+		setBrush(context, attrs);		
 	}
 
 	public UIGraphView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		setPaintOptions(context, attrs);
+		defaultBrush = new brush();		
+		setBrush(context, attrs);
 	}	
 	
 	protected void drawGraphLines(int numlinesX, int numlinesY, int leftOffset, int bottomOffset){
@@ -155,25 +163,10 @@ public class UIGraphView extends View {
 		tiPath.lineTo(leftOffset+divisorV*4, height );		
 		
 		//tiBitmapPaint.measureText("drawText:")
-		tiCanvas.drawText("1000", 20, divisor, tiBitmapPaint);// determine text box size?		
-		tiCanvas.drawText("1000", 20, divisor*2, tiBitmapPaint);// determine text box size?
-		tiCanvas.drawText("1000", 20, divisor*3, tiBitmapPaint);// determine text box size?
-		tiCanvas.drawText("1000", 20, divisor*4, tiBitmapPaint);// determine text box size?
-		
-		//tiBitmapPaint.setColor(Color.RED);
-		//
-		//
-		//
-		//
-		Paint redBrush = new Paint();
-		redBrush.setAntiAlias(true);
-		redBrush.setDither(true);
-		redBrush.setColor(Color.RED);
-		redBrush.setStyle(Paint.Style.STROKE);
-		redBrush.setStrokeJoin(Paint.Join.ROUND);
-		redBrush.setStrokeCap(Paint.Cap.ROUND);
-		redBrush.setStrokeWidth(2);
-		redBrush.setAlpha(255);  
+		tiCanvas.drawText("1000", 20, divisor, defaultBrush.getPaint());// determine text box size?		
+		tiCanvas.drawText("1000", 20, divisor*2, defaultBrush.getPaint());// determine text box size?
+		tiCanvas.drawText("1000", 20, divisor*3, defaultBrush.getPaint());// determine text box size?
+		tiCanvas.drawText("1000", 20, divisor*4, defaultBrush.getPaint());// determine text box size?
 		
 		//tiPath.moveTo(leftOffset, 0 );	//top left corner
 		//tiPath.lineTo(width, height); //bottom right corner
@@ -183,7 +176,7 @@ public class UIGraphView extends View {
 		
 		//tiPath.moveTo((width+leftOffset)/2, 0 );	//center vertical line
 		//tiPath.lineTo((width+leftOffset)/2, height); 		//bottom right corner
-		tiCanvas.drawPath(tiPath, redBrush);
+		tiCanvas.drawPath(tiPath, defaultBrush.getPaint());
 		
 	}
 	
@@ -214,16 +207,16 @@ public class UIGraphView extends View {
 			canvas.drawColor(containsBG ? TiConvert.toColor(props, TiC.PROPERTY_BACKGROUND_COLOR) : TiConvert.toColor("transparent"));
 		}*/		
 		//Log.i(tag, "onDraw fired: " + hasBackgroundImage)
-		canvas.drawBitmap(tiBitmap, 0, 0, tiBitmapPaint);
+		canvas.drawBitmap(tiBitmap, 0, 0, defaultBrush.getPaint());
 		if (tiPath != null) {
 			//Log.i(tag, "tiPath != null ");
-			canvas.drawPath(tiPath, tiBitmapPaint);
+			canvas.drawPath(tiPath, defaultBrush.getPaint());
 		}
 	}
 	
 	public void finalizePaths() {
 		if (tiPath != null) {
-			tiCanvas.drawPath(tiPath, tiBitmapPaint);
+			tiCanvas.drawPath(tiPath, defaultBrush.getPaint());
 			tiPath.reset();
 			tiPath = null;
 		}		
