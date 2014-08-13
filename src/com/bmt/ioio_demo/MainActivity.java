@@ -360,19 +360,8 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 		//enableUi(false);        //interrupted
 		if(show_toast_connection_info) toast("IOIO interrupted"); 		
 	}
+
 	@Override
-	protected void setup() {
-		try{
-			OutputPins = new HashMap<String, OutputPin>();			
-			toast("ioio setup_success: ");
-			OutputPins.put("led", new OutputPin(0,3,false));  //mode 3 = open_collector
-			Thread.sleep(250);
-			
-		} catch (Exception e) {
-			toast("setup_Error: "+e.getMessage()+" "+e.getLocalizedMessage());
-		}			
-	}
-	/*@Override
 	protected void setup() {
 		try{
 			enableUi(true);
@@ -435,7 +424,7 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 		} catch (Exception e) {
 			toast("setup_Error: "+e.getMessage()+" "+e.getLocalizedMessage());
 		}			
-	}*/
+	}
 	
 	@Override
 	public void incompatible() {
@@ -454,7 +443,7 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 	public void loop() {		
 		try {
 			//see if any buttons changed and update output			
-			/*for( Entry<String, ToggleButton> entry : ToggleButtons.entrySet()){								
+			for( Entry<String, ToggleButton> entry : ToggleButtons.entrySet()){								
 				if(entry.getKey().contentEquals("led")){ 
 					if(entry.getValue().isChecked()){
 						OutputPins.get("led").writeBit(false);
@@ -491,7 +480,7 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 					v = AnalogPins.get("AN"+i).readAnalogInBuffered();
 				if(TextViews.containsKey("AN"+i))
 					setText("AN"+i, v);
-			}*/		
+			}		
 									
 		} catch (Exception e) {
 			toast("loop Error: "+e.getMessage()+" , "+e.getLocalizedMessage() );
