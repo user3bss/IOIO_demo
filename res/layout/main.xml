@@ -16,64 +16,67 @@
 		    android:orientation="vertical" >
 
 			<LinearLayout
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center_vertical|center_horizontal|center" >
+			    android:layout_width="420dp"
+			    android:layout_height="wrap_content"
+			    android:layout_gravity="center_horizontal" >
+
 				<LinearLayout
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:orientation="vertical" >
+
 					<TextView
-						android:id="@+id/AN0Text"
-						android:layout_width="160dp"
-						android:layout_height="wrap_content"
-						android:text="AN0"
-						android:textAppearance="?android:attr/textAppearanceLarge" />
+					    android:id="@+id/AN0Text"
+					    android:layout_width="200dp"
+					    android:layout_height="wrap_content"
+					    android:text="AN0"
+					    android:textAppearance="?android:attr/textAppearanceLarge" />
+
 					<TextView
 						android:id="@+id/AN1Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN1"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN2Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN2"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN3Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN3"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN4Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN4"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN5Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN5"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN6Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN6"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN7Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN7"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/D9Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="D9"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -84,49 +87,49 @@
 					android:orientation="vertical" >
 					<TextView
 						android:id="@+id/AN8Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN8 : 3.32345"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN9Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN9"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN10Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN10"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN11Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN11"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN12Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN12"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN13Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN13"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN14Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN14"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
 					<TextView
 						android:id="@+id/AN15Text"
-						android:layout_width="160dp"
+						android:layout_width="200dp"
 						android:layout_height="wrap_content"
 						android:text="AN15"
 						android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -201,12 +204,15 @@
 							android:text="ToggleButton"
 							android:textOff="D6"
 							android:textOn="D6" />
+
 						<ToggleButton
-							android:id="@+id/toggleButtonD7"
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:text="ToggleButton"
-							android:textOff="D7" />
+						    android:id="@+id/toggleButtonD7"
+						    android:layout_width="wrap_content"
+						    android:layout_height="wrap_content"
+						    android:text="ToggleButton"
+						    android:textOff="D7"
+						    android:textOn="D7" />
+
 					</LinearLayout>
 
 					<LinearLayout

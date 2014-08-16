@@ -79,13 +79,16 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 	        }
 	    });		
 	}	
-	public void setText(final String pin, final float v){
+	public void setText(final String pinName, final float v){
 	    runOnUiThread(new Runnable() {
 	        @Override
 	        public void run() {
 	            // This code will always run on the UI thread, therefore is safe to modify UI elements.
-	        	String s = "AN"+pin+": "+v;
-	        	TextViews.get(pin).setText(s.substring(0, 6));
+				if( TextViews.containsKey(pinName) ){		//textViews ANO-AN15
+					TextView tv = TextViews.get( pinName );
+					tv.setText(pinName+":"+v);
+		        	//TextViews.get(pinName).setText(s.substring(0, 6));
+				}	        	
 	        }
 	    });		
 	}	
@@ -223,13 +226,7 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 			//printAnalogDroppedSamples(aIn0);
 			//int numSampleToRead = ioiopina.available();
 			//for(int i=0;i<numSampleToRead;i++){	//reads all available samples
-				v = ioiopina.getVoltageBuffered();				
-				int _PinNum = pin_num-31;
-				if( TextViews.containsKey("AN"+_PinNum) ){		//textViews ANO-AN15
-					//TextView tv = TextViews.get( "AN"+_PinNum );
-					//tv.setText("AN"+_PinNum);
-					setText("AN"+_PinNum, v);
-				}
+				v = ioiopina.getVoltageBuffered();
 				//val = ioiopina.readBuffered();
 				//toast("Voltage: "+v+", Value: "+val);				
 			//}
@@ -238,13 +235,13 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 		public float readAnalogInUnBuffered() throws InterruptedException, ConnectionLostException{
 			float v = 0;
 			//float val = 0;			
-			printDroppedSamples();
-			int numSampleToRead = ioiopina.available();
-			for(int i=0;i<numSampleToRead;i++){	//reads all available samples
+			//printDroppedSamples();
+			//int numSampleToRead = ioiopina.available();
+			//for(int i=0;i<numSampleToRead;i++){	//reads all available samples
 				v = ioiopina.getVoltage();
 				//val = ioiopina.read();
 				//toast("Voltage: "+v+", Value: "+val);
-			}
+			//}
 			return v;			
 		}
 		public void setRefVolts(float volts){
@@ -368,7 +365,7 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 			showVersions(ioio_, "IOIO connected!");	
 			OutputPins = new HashMap<String, OutputPin>(); 
 			AnalogPins = new HashMap<String, AnalogPin>();
-			Twi_proxies = new HashMap<String, Twi_proxy>();
+			//Twi_proxies = new HashMap<String, Twi_proxy>();
 			
 			OutputPins.put("led", new OutputPin(0,3,false));  //mode 3 = open_collector
 			Thread.sleep(250);
@@ -413,6 +410,7 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 			for(int i=0;i<16;i++){
 				AnalogPins.put("AN"+i, new AnalogPin(i+31));				
 			}
+			//toast("done settings up an0-15");
 			
 			//Spi_proxy Spi = new Spi_proxy();
 			//_spi.setSpiPins(_misoPin, _mosiPin, _clkPin, _ssPins);
@@ -470,17 +468,19 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 			setTextD9(); //read inputpin 9 and set label			
 			//get analog inputs and display in text views			
 			//Thread.sleep(350); 			 //milliseconds, = 50 samples in buffer for analog
-			Thread.sleep(250); 			 //milliseconds, = 50 samples in buffer for analog
+			Thread.sleep(120); 			 //milliseconds, = 50 samples in buffer for analog
 			
 			//Process Analog Inputs
-			int i=0;
-			for(i=0;i<16;i++){
+			for( Entry<String, AnalogPin> entry : AnalogPins.entrySet()){
 				float v = 0;
-				if(AnalogPins.containsKey("AN"+i)) 
-					v = AnalogPins.get("AN"+i).readAnalogInBuffered();
-				if(TextViews.containsKey("AN"+i))
-					setText("AN"+i, v);
-			}		
+				if(TextViews.containsKey(entry.getKey())){
+					v = entry.getValue().readAnalogInBuffered();
+					//v = AnalogPins.get(entry.getKey()).readAnalogInBuffered();
+					setText(entry.getKey(), v);
+				} else {
+					toast("no entry for ");
+				}
+			}
 									
 		} catch (Exception e) {
 			toast("loop Error: "+e.getMessage()+" , "+e.getLocalizedMessage() );
@@ -550,20 +550,16 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 	}	
 	private void showVersions(IOIO ioio, String title) {
 		if(show_toast_connection_info){
-			try {
-				toast(String.format("%s\n" +
-						"IOIOLib: %s\n" +
-						"Application firmware: %s\n" +
-						"Bootloader firmware: %s\n" +
-						"Hardware: %s",
-						title,
-						ioio.getImplVersion(VersionType.IOIOLIB_VER),
-						ioio.getImplVersion(VersionType.APP_FIRMWARE_VER),
-						ioio.getImplVersion(VersionType.BOOTLOADER_VER),
-						ioio.getImplVersion(VersionType.HARDWARE_VER)));
-			} catch (ConnectionLostException e) {
-
-			}
+			toast(String.format("%s\n" +
+					"IOIOLib: %s\n" +
+					"Application firmware: %s\n" +
+					"Bootloader firmware: %s\n" +
+					"Hardware: %s",
+					title,
+					ioio.getImplVersion(VersionType.IOIOLIB_VER),
+					ioio.getImplVersion(VersionType.APP_FIRMWARE_VER),
+					ioio.getImplVersion(VersionType.BOOTLOADER_VER),
+					ioio.getImplVersion(VersionType.HARDWARE_VER)));
 		}
 	}
 

@@ -5,7 +5,7 @@
     android:orientation="vertical" >
 
     <com.bmt.customviews.UIGraphView
-        android:id="@+id/uIGraphView0"
+        android:id="@+id/uIGraphView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

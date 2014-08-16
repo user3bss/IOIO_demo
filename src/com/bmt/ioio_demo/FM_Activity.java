@@ -158,21 +158,16 @@ public class FM_Activity extends IOIOActivity implements OnClickListener{
 	}	
 	private void showVersions(IOIO ioio, String title) {
 		if(show_toast_connection_info){
-			try {
-				toast(String.format("%s\n" +
-						"IOIOLib: %s\n" +
-						"Application firmware: %s\n" +
-						"Bootloader firmware: %s\n" +
-						"Hardware: %s",
-						title,
-						ioio.getImplVersion(VersionType.IOIOLIB_VER),
-						ioio.getImplVersion(VersionType.APP_FIRMWARE_VER),
-						ioio.getImplVersion(VersionType.BOOTLOADER_VER),
-						ioio.getImplVersion(VersionType.HARDWARE_VER)));
-			} catch (ConnectionLostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			toast(String.format("%s\n" +
+					"IOIOLib: %s\n" +
+					"Application firmware: %s\n" +
+					"Bootloader firmware: %s\n" +
+					"Hardware: %s",
+					title,
+					ioio.getImplVersion(VersionType.IOIOLIB_VER),
+					ioio.getImplVersion(VersionType.APP_FIRMWARE_VER),
+					ioio.getImplVersion(VersionType.BOOTLOADER_VER),
+					ioio.getImplVersion(VersionType.HARDWARE_VER)));
 		}
 	}
 

@@ -54,18 +54,21 @@ public class UIKnob extends View implements OnGestureListener {
 	public  UIKnob(Context context) {
 		super(context);
 		setPaintOptions(context);
-		gestureDetector = new GestureDetector(getContext(), this);
+		if(!isInEditMode())
+			gestureDetector = new GestureDetector(getContext(), this);
 	}
 	public  UIKnob(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setPaintOptions(context, attrs);
-		gestureDetector = new GestureDetector(getContext(), this);
+		if(!isInEditMode())
+			gestureDetector = new GestureDetector(getContext(), this);
 	}
 
 	public  UIKnob(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		setPaintOptions(context, attrs);
-		gestureDetector = new GestureDetector(getContext(), this);
+		if(!isInEditMode())
+			gestureDetector = new GestureDetector(getContext(), this);
 	}	  
 
 	  @Override
