@@ -15,7 +15,6 @@ import ioio.lib.util.android.IOIOActivity;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;

@@ -45,7 +45,7 @@ public class UIKnob extends View implements OnGestureListener {
 		enabled = s;
 	}
 	
-	private UIKnobListener m_listener;
+	private UIKnobListener m_listener = null;
 	public void SetListener(UIKnobListener uiKnobListener) {
 		// TODO Auto-generated method stub
 		m_listener = uiKnobListener;

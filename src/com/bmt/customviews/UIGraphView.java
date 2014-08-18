@@ -7,22 +7,22 @@
 package com.bmt.customviews;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import com.bmt.ioio_demo.R;
-
 
 public class UIGraphView extends View {
-	private Path tiPath = null;
-	private Bitmap tiBitmap = null;
+	private Path border_path = null;
+	private Path graph_lines_path = null;
+	
+	private Bitmap background_bitmap = null;
 	//private Bitmap tiBackground = null;
 	private Canvas tiCanvas = null;
 	String tag = getClass().getSimpleName();
@@ -43,15 +43,17 @@ public class UIGraphView extends View {
 	private void setupPaint(){
 		border_paint = new Paint();
 		setPaintDefaults(border_paint, "#000000");
+		border_paint.setStrokeWidth(1);
+		
 		graph_lines_paint = new Paint();
 		setPaintDefaults(graph_lines_paint, "#3c3c3c");
 		graph_text_paint = new Paint();
 		setPaintDefaults(graph_text_paint, "#000000");		
 	}
-	private class brush_stroke{
+	private class line_chart{
 		//private Path[] _Path = null;			//store path with paint
-		private Paint _BitmapPaint = null;		
-		brush_stroke(){
+		public Paint _BitmapPaint = null;
+		line_chart(){
 			_BitmapPaint = new Paint();
 			_BitmapPaint.setAntiAlias(true);
 			_BitmapPaint.setDither(true);
@@ -62,51 +64,46 @@ public class UIGraphView extends View {
 			_BitmapPaint.setStrokeWidth(2);
 			_BitmapPaint.setAlpha(255);
 		}
-		/*public Path[] getPaths(){
-			return _Path;	//return the array
-		}*/
-		public Paint getPaint(){
-			return _BitmapPaint;
+		public void drawPoints(Canvas ctx, float[] points){
+			ctx.drawPoints(points, 0, points.length, _BitmapPaint);
 		}
-		public void setAntiAlias(boolean AntiAlias){
-			_BitmapPaint.setAntiAlias(AntiAlias);		
+		private float min(float[] values){
+			float min = 100000000;
+			for(int i=0;i<values.length;i++){
+				if(values[i] < min){
+					min = values[i];
+				}
+			}
+			return min;
 		}
-		public void setDither(boolean Dither){
-			_BitmapPaint.setDither(Dither);
-		}
-		public void setStrokeJoin(int StrokeJoin){
-			if(StrokeJoin == 0)
-				_BitmapPaint.setStrokeJoin(Paint.Join.ROUND);
-			if(StrokeJoin == 1)
-				_BitmapPaint.setStrokeJoin(Paint.Join.BEVEL);
-			if(StrokeJoin == 2)
-				_BitmapPaint.setStrokeJoin(Paint.Join.MITER);
-		}
-		public void setStrokeCap(int StrokeCap){
-			if(StrokeCap == 0)
-				_BitmapPaint.setStrokeCap(Paint.Cap.ROUND);
-			if(StrokeCap == 1)
-				_BitmapPaint.setStrokeCap(Paint.Cap.BUTT);
-			if(StrokeCap == 2)
-				_BitmapPaint.setStrokeCap(Paint.Cap.SQUARE);		
-		}
-		public void setStrokeWidth(int StrokeWidth){
-			_BitmapPaint.setStrokeWidth(StrokeWidth);
-		}
-		public void setPaintStyle(int Paint_Style){
-			if(Paint_Style == 0)
-				_BitmapPaint.setStyle(Paint.Style.STROKE);
-			if(Paint_Style == 1)
-				_BitmapPaint.setStyle(Paint.Style.FILL);
-			if(Paint_Style == 2)
-				_BitmapPaint.setStyle(Paint.Style.FILL_AND_STROKE);		
-		}
-		public void setColor(int _Color){
-			_BitmapPaint.setColor(_Color);	
-		}
-		public void setAlpha(int _Alpha){		
-			_BitmapPaint.setAlpha(_Alpha);
+		private float max(float[] values){
+			float max = -100000000;
+			for(int i=0;i<values.length;i++){
+				if(values[i] > max){
+					max = values[i];
+				}
+			}
+			return max;
 		}		
+		public void drawValues(Canvas ctx, float[] values, int leftOffset){
+			float[] points = new float[values.length*2];
+			int w = ctx.getWidth() - leftOffset;
+			int h = ctx.getHeight();
+			int sample_rate = 1000;
+			double yScale = (h / 3.3);
+			//double xTime_Per_Pixel = w / sample_rate; //640px-75px/1khz = .565s resolution
+			ctx.save();
+			ctx.scale(-1,1,w/2,h/2);
+			
+			//values.length <= chart_available_width
+			for(int i =0;i<values.length;i++){	
+				points[i] = leftOffset+i;
+				points[i+1] = (float) (values[i] * yScale);
+			}
+			drawPoints(ctx, points);
+			//ctx.scale(-1,1,w/2,h/2);
+			ctx.restore();
+		}
 	}
 	/*
 	public void setBrush(Context context, AttributeSet attrs) {		
@@ -146,47 +143,30 @@ public class UIGraphView extends View {
 	protected void drawGraphLines(int numlinesX, int numlinesY, int leftOffset, int bottomOffset){
 		int width = tiCanvas.getWidth();
 		int height = tiCanvas.getHeight();
+		graph_lines_path = new Path();
+		graph_lines_path.moveTo(leftOffset, 0);	//draw border
+		graph_lines_path.lineTo(width, 0);
+		graph_lines_path.lineTo(width, height-bottomOffset);
+		graph_lines_path.lineTo(leftOffset, height-bottomOffset);
+		graph_lines_path.lineTo(leftOffset, 0);
 		
-		int spacingX = (width - leftOffset)/numlinesX;
-		int spacingY = (height - bottomOffset)/numlinesY;
-		tiPath = new Path();
-		tiPath.moveTo(leftOffset, 0);	//draw border
-		tiPath.lineTo(width, 0);
-		tiPath.lineTo(width, height-bottomOffset);
-		tiPath.lineTo(leftOffset, height-bottomOffset);
-		tiPath.lineTo(leftOffset, 0);
+		float divisor = (height-bottomOffset)/numlinesY;
+		for(int i=0;i<numlinesY;i++){
+			graph_lines_path.moveTo(leftOffset, ((i+1)*divisor) );	//draw border
+			graph_lines_path.lineTo(width, ((i+1)*divisor));			
+		}
 		
-		float divisor = (height-bottomOffset)/5;
-		tiPath.moveTo(leftOffset, divisor );	//draw border
-		tiPath.lineTo(width, divisor);
-				
-		tiPath.moveTo(leftOffset,  divisor*2);	//draw border
-		tiPath.lineTo(width, divisor*2);
+		float divisorV = (width-leftOffset)/numlinesX;
 		
-		tiPath.moveTo(leftOffset, divisor*3 );	//draw border
-		tiPath.lineTo(width, divisor*3);
-
-		tiPath.moveTo(leftOffset, divisor*4 );	//draw border
-		tiPath.lineTo(width, divisor*4);
-		
-		float divisorV = (width-leftOffset)/5;
-		tiPath.moveTo(leftOffset+divisorV, 0 );	//draw border
-		tiPath.lineTo(leftOffset+divisorV, height );		
-		
-		tiPath.moveTo(leftOffset+divisorV*2, 0 );	//draw border
-		tiPath.lineTo(leftOffset+divisorV*2, height );
-		
-		tiPath.moveTo(leftOffset+divisorV*3, 0 );	//draw border
-		tiPath.lineTo(leftOffset+divisorV*3, height );
-		
-		tiPath.moveTo(leftOffset+divisorV*4, 0 );	//draw border
-		tiPath.lineTo(leftOffset+divisorV*4, height );		
-		
-		//tiBitmapPaint.measureText("drawText:")
-		tiCanvas.drawText("1000", 20, divisor, graph_text_paint);// determine text box size?		
-		tiCanvas.drawText("1000", 20, divisor*2, graph_text_paint);// determine text box size?
-		tiCanvas.drawText("1000", 20, divisor*3, graph_text_paint);// determine text box size?
-		tiCanvas.drawText("1000", 20, divisor*4, graph_text_paint);// determine text box size?
+		tiCanvas.drawText("3.3", 20, 0+graph_text_paint.getTextSize(), graph_text_paint);// determine text box size?
+		for(int i=0;i<numlinesY-1;i++){
+			graph_lines_path.moveTo(leftOffset+((i+1)*divisorV), 0 );
+			graph_lines_path.lineTo(leftOffset+((i+1)*divisorV), height );
+			
+			String v = ((3.3/numlinesY)*(numlinesY-i-1))+"";
+			tiCanvas.drawText( v.substring(0, 4), 20, (divisor*(i+1))+(graph_text_paint.getTextSize()/2), graph_text_paint);// determine text box size?	
+		}
+		tiCanvas.drawText("0", 20, height, graph_text_paint);// determine text box size?
 		
 		//tiPath.moveTo(leftOffset, 0 );	//top left corner
 		//tiPath.lineTo(width, height); //bottom right corner
@@ -196,53 +176,45 @@ public class UIGraphView extends View {
 		
 		//tiPath.moveTo((width+leftOffset)/2, 0 );	//center vertical line
 		//tiPath.lineTo((width+leftOffset)/2, height); 		//bottom right corner
-		tiCanvas.drawPath(tiPath, graph_lines_paint);		
+		tiCanvas.drawPath(graph_lines_path, graph_lines_paint);		
 	}
-	
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		//if(!isInEditMode()){		
 			Log.d(tag, "onSizeChanged: ");
 			super.onSizeChanged(w, h, oldw, oldh);
-			tiBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-			tiCanvas = new Canvas(tiBitmap);
+			background_bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+			tiCanvas = new Canvas(background_bitmap);
 			int width = tiCanvas.getWidth();
 			int height = tiCanvas.getHeight();
-			tiPath = new Path();
-			tiPath.moveTo(0, 0);	//draw border
-			tiPath.lineTo(width, 0);
-			tiPath.lineTo(width, height);
-			tiPath.lineTo(0, height);
-			tiPath.lineTo(0, 0);
+			border_path = new Path();
+			border_path.moveTo(0, 0);	//draw border
+			border_path.lineTo(width, 0);
+			border_path.lineTo(width, height);
+			border_path.lineTo(0, height);
+			border_path.lineTo(0, 0);
+			tiCanvas.drawPath(border_path, border_paint);
 			//tiBitmapPaint.setTextSize(20);
 			//tiBitmapPaint.setShadowLayer(35, 0, 0, Color.DKGRAY);
 			//tiCanvas.drawText("drawText:"+tiBitmapPaint.measureText("drawText:"), 10, 20, tiBitmapPaint);// determine text box size?
-			drawGraphLines(3, 3, 100, 0);
+			drawGraphLines(4, 4, 75, 0);
 			invalidate();
 		//}	
 	}	
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		/*if(!hasBackgroundImage){ 
-			boolean containsBG = props.containsKeyAndNotNull(TiC.PROPERTY_BACKGROUND_COLOR);
-			canvas.drawColor(containsBG ? TiConvert.toColor(props, TiC.PROPERTY_BACKGROUND_COLOR) : TiConvert.toColor("transparent"));
-		}*/		
-		//Log.i(tag, "onDraw fired: " + hasBackgroundImage)
-		canvas.drawBitmap(tiBitmap, 0, 0, border_paint);
-		if (tiPath != null) {
-			//Log.i(tag, "tiPath != null ");
-			canvas.drawPath(tiPath, border_paint);
+		canvas.drawBitmap(background_bitmap, 0, 0, border_paint);
+		if (border_path != null){
+			canvas.drawPath(border_path, border_paint);
+		}
+		if(graph_lines_path != null){
+			canvas.drawPath(graph_lines_path, graph_lines_paint);
 		}
 	}
 
 	public void clear() {
-		if (tiPath != null) {
-			//tiCanvas.drawPath(tiPath, );
-			tiPath.reset();
-			tiPath = null;
-		}
-		tiBitmap.eraseColor(Color.TRANSPARENT);	//don't want to erase backgroundImage, commenting doesn't erase anything
+		background_bitmap.eraseColor(Color.TRANSPARENT);	//don't want to erase backgroundImage, commenting doesn't erase anything
 		invalidate();
 	}
 }

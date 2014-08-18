@@ -28,26 +28,125 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 	private float 				mAngleDown , mAngleUp, mAngle;
 	private Bitmap background = null;
 	private Bitmap rotor = null;
-	private Bitmap stator = null;	
+	private Bitmap stator = null;
+	int default_stator_image = R.drawable.statorswitch;
+	int default_rotor_image = R.drawable.rotoron;	
 	private Path tiPath = null;	
 	private boolean enabled = true;
+	private int position = 0;
 	String tag = getClass().getSimpleName();	
 	Context c = null;
 	
 	public interface UIKnobSwitchListener {
-		public void onChange(int percent);
+		public void onChange(int position);
 	}
-	private UIKnobSwitchListener m_listener;
+	private UIKnobSwitchListener m_listener = null;
 	public void SetListener(UIKnobSwitchListener uiKnobListener) {
 		m_listener = uiKnobListener;
 	}
+	public void set_stator_image(int r){
+		stator = BitmapFactory.decodeResource(c.getResources(), r);		
+	}
+	public void set_stator_image(Bitmap b){
+		stator = b;
+	}
+	public void set_rotor_image(int r){
+		rotor = BitmapFactory.decodeResource(c.getResources(), r);		
+	}
+	public void set_rotor_image(Bitmap b){
+		rotor = b;		
+	}
+	public void set_position(int _position){
+	   	switch(_position){
+	   		case 0:
+	   			setRotorPosAngle(-144);
+	   			break;
+	   		case 1:
+	   			setRotorPosAngle(-90);
+	   			break;
+	   		case 2:
+	   			setRotorPosAngle(0);
+	   			break;
+	   		case 3:
+	   			setRotorPosAngle(90);
+	   			break;
+	   		case 4:
+	   			setRotorPosAngle(144);
+	   			break;
+	   		default:
+	   			setRotorPosAngle(-144);	   			
+	   			break;
+	   	}
+	}	
+	private float cartesianToPolar(float x, float y) {
+		return (float) -Math.toDegrees(Math.atan2(x - 0.5f, y - 0.5f));
+	}	
+	private void setRotorPosAngle(float deg) {
+		if (deg >= 210 || deg <= 150) {
+			if (deg > 180) deg = deg - 360;
+			
+			if (deg <= -134 && deg >= -154) {
+				mAngle = -144;
+	   			position = 0;
+			}
+			else if (deg <= -80 && deg >= -100){
+				mAngle = -90;
+	   			position = 1;
+			}			
+			else if (deg <= 10 && deg >=-10) {
+				mAngle = 0;
+	   			position = 2;
+			}
+			else if (deg >= 80 && deg <= 100){
+				mAngle = 90;
+	   			position = 3;
+			}			
+			else if (deg >= 134 && deg <= 154) {
+				mAngle = 144;
+	   			position = 4;
+			}
+   			if (m_listener != null) m_listener.onChange(position);			
+			invalidate();
+		}
+	}	
+	private void setPaintOptions(Context context) {
+		tiBitmapPaint = new Paint();
+		tiBitmapPaint.setAntiAlias(true);
+		tiBitmapPaint.setDither(true);
+		tiBitmapPaint.setColor(Color.BLACK);
+		tiBitmapPaint.setStyle(Paint.Style.STROKE);
+		tiBitmapPaint.setStrokeJoin(Paint.Join.ROUND);
+		tiBitmapPaint.setStrokeCap(Paint.Cap.ROUND);
+		tiBitmapPaint.setStrokeWidth(2);
+		tiBitmapPaint.setAlpha(128);
+		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);	
+		c = context;		
+	}
+	private void setPaintOptions(Context context, AttributeSet attrs) {		
+		Log.i(tag, "using attrs");
+		   setPaintOptions(context);		   
+			TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.UIKnobSwitch, 0, 0);
+			   try {
+				   	int _position = a.getInt(R.styleable.UIKnobSwitch_position, 2);
+				   	set_position(_position);
+					set_stator_image(a.getResourceId(R.styleable.UIKnobSwitch_stator_image, R.drawable.statorswitch));
+					set_rotor_image(a.getResourceId(R.styleable.UIKnobSwitch_rotor_image, R.drawable.rotoroff));
+					invalidate();
+			   } finally {
+			       a.recycle();
+			   }
+		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);		  
+	}
 	
-	public void setEnabled(boolean s){
-		enabled = s;
+	public void setEnabled(boolean b){
+		enabled = b;
 	}	
 	public  UIKnobSwitch(Context context) {
 		super(context);
 		setPaintOptions(context);
+		set_stator_image(default_stator_image);
+		set_rotor_image(default_rotor_image);
+		set_position(0);		
 		if(!isInEditMode())
 			gestureDetector = new GestureDetector(getContext(), this);
 	}
@@ -65,31 +164,28 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 			gestureDetector = new GestureDetector(getContext(), this);
 	}	  
 
-	  @Override
-	  public Parcelable onSaveInstanceState() {
-
+	@Override
+	public Parcelable onSaveInstanceState() {
 	    Bundle bundle = new Bundle();
 	    bundle.putParcelable("instanceState", super.onSaveInstanceState());
 	    bundle.putFloat("mAngle", mAngle);
 	    // ... save everything
 	    return bundle;
-	  }
-
-	  @Override
-	  public void onRestoreInstanceState(Parcelable state) {
-
-	    if (state instanceof Bundle) {
-	      Bundle bundle = (Bundle) state;
-	      this.mAngle = bundle.getFloat("mAngle");
-	      // ... load everything
-	      state = bundle.getParcelable("instanceState");
-	    }
-	    super.onRestoreInstanceState(state);
-	  }
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Parcelable state) {
+		if (state instanceof Bundle) {
+			Bundle bundle = (Bundle) state;
+			this.mAngle = bundle.getFloat("mAngle");
+			// ... load everything
+			state = bundle.getParcelable("instanceState");
+		}
+		super.onRestoreInstanceState(state);
+	}
 	
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		Log.d(tag, "onSizeChanged: ");
 		super.onSizeChanged(w, h, oldw, oldh);
 		background = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
 		ctx = new Canvas(background);
@@ -99,13 +195,9 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 	@Override
 	protected void onDraw(Canvas canvas) {
 	    DisplayMetrics metrics = getResources().getDisplayMetrics();
-	    //if(tiBitmapPaint == null) tiBitmapPaint = new Paint();
-	    //setPaintOptions(c);
-	    
 		canvas.drawBitmap(background, 0, 0, tiBitmapPaint);
 		Matrix scale_matrix = new Matrix();		
-		float scale = (this.getWidth()/metrics.scaledDensity) / 250.0f;	//graphic size is 250	
-		//scale_matrix.setTranslate(0, 0);
+		float scale = (this.getWidth()/metrics.scaledDensity) / 250.0f;	//graphic size is 250
 		scale_matrix.setScale(scale, scale);
 		canvas.drawBitmap(stator, scale_matrix, tiBitmapPaint);	
 		
@@ -117,38 +209,6 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		if (tiPath != null) {
 			canvas.drawPath(tiPath, tiBitmapPaint);
 		}		
-	}
-	private void setPaintOptions(Context context) {
-		tiBitmapPaint = new Paint();
-		tiBitmapPaint.setAntiAlias(true);
-		tiBitmapPaint.setDither(true);
-		tiBitmapPaint.setColor(Color.BLACK);
-		tiBitmapPaint.setStyle(Paint.Style.STROKE);
-		tiBitmapPaint.setStrokeJoin(Paint.Join.ROUND);
-		tiBitmapPaint.setStrokeCap(Paint.Cap.ROUND);
-		tiBitmapPaint.setStrokeWidth(2);
-		tiBitmapPaint.setAlpha(128);
-		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);	
-		c = context;
-		stator = BitmapFactory.decodeResource(c.getResources(), R.drawable.statorswitch);
-		rotor = BitmapFactory.decodeResource(c.getResources(), R.drawable.rotoron);		
-	}	
-	private void setPaintOptions(Context context, AttributeSet attrs) {		
-		Log.i(tag, "using attrs");
-		   setPaintOptions(context);
-		   
-			TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.UIKnob, 0, 0);
-		   try {	       
-				tiBitmapPaint = new Paint();
-
-		   } finally {
-		       a.recycle();
-		   }
-		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);		  
-	}	
-
-	private float cartesianToPolar(float x, float y) {
-		return (float) -Math.toDegrees(Math.atan2(x - 0.5f, y - 0.5f));
 	}
 	
 	@Override 
@@ -164,43 +224,7 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		}
 		return true;
 	}
-
-	public void setRotorPosAngle(float deg) {
-
-		if (deg >= 210 || deg <= 150) {
-			if (deg > 180) deg = deg - 360;
-			
-			if (deg <= -134 && deg >= -154) {
-				mAngle = -144;
-			}
-			else if (deg <= -80 && deg >= -100){
-				mAngle = -90;
-			}			
-			else if (deg <= 10 && deg >=-10) {
-				mAngle = 0;				
-			}
-			else if (deg >= 80 && deg <= 100){
-				mAngle = 90;
-			}			
-			else if (deg >= 134 && deg <= 154) {
-				mAngle = 144;				
-			}						
-			invalidate();
-		}
-	}
-	
-	public float getValue(){
-		return mAngle;
-	}
-	
-	public void setRotorPercentage(int percentage) {
-		int posDegree = percentage * 3 - 150;
-		if (posDegree < 0) posDegree = 360 + posDegree;
-		setRotorPosAngle(posDegree);
-	}
-	
-	@Override	
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+	private boolean setAngle(MotionEvent e2){
 		if(enabled){
 			float x = e2.getX() / ((float) getWidth());
 			float y = e2.getY() / ((float) getHeight());
@@ -215,17 +239,20 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 				if (posDegrees > 210 || posDegrees < 150) {
 					// rotate our imageview
 					setRotorPosAngle(posDegrees);
-					// get a linear scale
-					float scaleDegrees = rotDegrees + 150; // given the current parameters, we go from 0 to 300
-					// get position percent
-					int percent = (int) (scaleDegrees / 3);
-					if (m_listener != null) m_listener.onChange(percent);
 					return true; //consumed
 				}
 			}
-		} return false;
+		}
+		return false;		
 	}
-
+	@Override	
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+		return setAngle(e2);
+	}
+	@Override
+	public boolean onSingleTapUp(MotionEvent e2) {
+		return setAngle(e2);
+	}
 	@Override
 	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
 			float arg3) {
@@ -244,32 +271,4 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		// TODO Auto-generated method stub
 		
 	}
-	@Override
-	public boolean onSingleTapUp(MotionEvent e2) {
-		if(enabled){
-			float x = e2.getX() / ((float) getWidth());
-			float y = e2.getY() / ((float) getHeight());
-			float rotDegrees = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
-			
-			if (! Float.isNaN(rotDegrees)) {
-				// instead of getting 0-> 180, -180 0 , we go for 0 -> 360
-				float posDegrees = rotDegrees;
-				if (rotDegrees < 0) posDegrees = 360 + rotDegrees;
-				
-				// deny full rotation, start start and stop point, and get a linear scale
-				if (posDegrees > 210 || posDegrees < 150) {
-					// rotate our imageview
-					setRotorPosAngle(posDegrees);
-					// get a linear scale
-					float scaleDegrees = rotDegrees + 150; // given the current parameters, we go from 0 to 300
-					// get position percent
-					int percent = (int) (scaleDegrees / 3);
-					if (m_listener != null) m_listener.onChange(percent);
-					return true; //consumed
-				}
-			}
-		}
-		return false;	
-	}	
-
 }

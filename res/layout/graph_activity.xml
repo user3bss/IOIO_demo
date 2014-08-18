@@ -2,11 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="horizontal" xmlns:app="http://schemas.android.com/apk/res/com.bmt.ioio_demo">
 
     <com.bmt.customviews.UIGraphView
-        android:id="@+id/uIGraphView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:id="@+id/graph0"
+        android:layout_width="720dp"
+        android:layout_height="250dp"
+        android:layout_margin="10dp" />
+
+    <com.bmt.customviews.UIKnobSwitch
+        android:id="@+id/sw_knob0"
+        android:layout_width="260dp"
+        android:layout_height="250dp"
+        android:layout_margin="10dp" />
 
 </LinearLayout>
