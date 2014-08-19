@@ -51,7 +51,6 @@ public class UIGraphView extends View {
 		setPaintDefaults(graph_text_paint, "#000000");		
 	}
 	private class line_chart{
-		//private Path[] _Path = null;			//store path with paint
 		public Paint _BitmapPaint = null;
 		line_chart(){
 			_BitmapPaint = new Paint();
@@ -65,8 +64,23 @@ public class UIGraphView extends View {
 			_BitmapPaint.setAlpha(255);
 		}
 		public void drawPoints(Canvas ctx, float[] points){
-			ctx.drawPoints(points, 0, points.length, _BitmapPaint);
+			//ctx.drawPoints(points, 0, points.length, _BitmapPaint);			
+			for(int i=0;i<points.length;i+=2){
+				Path l = new Path();
+				l.moveTo(points[i], points[i+1]);				
+				l.lineTo(points[i], points[i+1]);
+				ctx.drawPath(l, _BitmapPaint);
+			}			
 		}
+		public void drawLines(Canvas ctx, float[] points){
+			//ctx.drawPoints(points, 0, points.length, _BitmapPaint);
+			Path l = new Path();
+			l.moveTo(points[0], points[1]);			
+			for(int i=2;i<points.length;i+=2){				
+				l.lineTo(points[i], points[i+1]);				
+			}
+			ctx.drawPath(l, _BitmapPaint);			
+		}		
 		private float min(float[] values){
 			float min = 100000000;
 			for(int i=0;i<values.length;i++){
@@ -93,15 +107,16 @@ public class UIGraphView extends View {
 			double yScale = (h / 3.3);
 			//double xTime_Per_Pixel = w / sample_rate; //640px-75px/1khz = .565s resolution
 			ctx.save();
-			ctx.scale(-1,1,w/2,h/2);
+			ctx.scale(1,-1,w/2,h/2);
 			
 			//values.length <= chart_available_width
-			for(int i =0;i<values.length;i++){	
-				points[i] = leftOffset+i;
-				points[i+1] = (float) (values[i] * yScale);
+			int pointINDX = 0;
+			for(int i =0;i<values.length;i++){
+				points[pointINDX++] = leftOffset+i;			//each value = 1px
+				points[pointINDX++] = (float) (values[i] * yScale);
 			}
-			drawPoints(ctx, points);
-			//ctx.scale(-1,1,w/2,h/2);
+			//drawPoints(ctx, points);
+			drawLines(ctx, points);
 			ctx.restore();
 		}
 	}
@@ -176,7 +191,10 @@ public class UIGraphView extends View {
 		
 		//tiPath.moveTo((width+leftOffset)/2, 0 );	//center vertical line
 		//tiPath.lineTo((width+leftOffset)/2, height); 		//bottom right corner
-		tiCanvas.drawPath(graph_lines_path, graph_lines_paint);		
+		tiCanvas.drawPath(graph_lines_path, graph_lines_paint);	
+		line_chart lc = new line_chart();
+		float[] v = {0,1,1,1,1,1,1,1,1};
+		lc.drawValues(tiCanvas, v, 80);
 	}
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
