@@ -198,7 +198,7 @@ public class UIGraphView extends View {
 			lc._BitmapPaint.setColor(Color.BLUE);
 			float[] v = new float[width-leftOffset];
 			for(int i=0;i<width-leftOffset;i++){
-				v[i] = (float) (1.65 * Math.sin(i*0.0174532925) + 1.65); //.017 rad = 1 deg
+				v[i] = (float) (1.65 * Math.sin(i*0.05) + 1.65); //.017 rad = 1 deg
 			}
 			lc.drawValues(tiCanvas, v, 75);
 		}
