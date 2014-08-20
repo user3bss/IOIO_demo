@@ -192,9 +192,16 @@ public class UIGraphView extends View {
 		//tiPath.moveTo((width+leftOffset)/2, 0 );	//center vertical line
 		//tiPath.lineTo((width+leftOffset)/2, height); 		//bottom right corner
 		tiCanvas.drawPath(graph_lines_path, graph_lines_paint);	
-		line_chart lc = new line_chart();
-		float[] v = {0,1,1,1,1,1,1,1,1};
-		lc.drawValues(tiCanvas, v, 80);
+		//prepare and draw sine wave
+		if(isInEditMode()){
+			line_chart lc = new line_chart();
+			lc._BitmapPaint.setColor(Color.BLUE);
+			float[] v = new float[width-leftOffset];
+			for(int i=0;i<width-leftOffset;i++){
+				v[i] = (float) (1.65 * Math.sin(i*0.0174532925) + 1.65); //.017 rad = 1 deg
+			}
+			lc.drawValues(tiCanvas, v, 75);
+		}
 	}
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
