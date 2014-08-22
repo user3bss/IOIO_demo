@@ -8,7 +8,9 @@ import ioio.lib.util.BaseIOIOLooper;
 import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.android.IOIOActivity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -19,6 +21,8 @@ import android.widget.Toast;
 
 import com.bmt.customviews.UIGraphView;
 import com.bmt.customviews.UIKnobSwitch;
+import com.bmt.customviews.UIKnobSwitch.UIKnobSwitchListener;
+import com.bmt.ioio_demo.GraphActivity._IOIOLooper.AnalogPin;
 
 
 public class GraphActivity extends IOIOActivity implements OnClickListener{
@@ -27,7 +31,10 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
 	boolean show_toast_connection_info = true;
 	UIKnobSwitch sw_knob0 = null;
 	UIGraphView graph0 = null;
-	
+
+	private void graph_pin(String pin){
+		//graph0.
+	}
 	private void enableUi(final boolean enable) {
 		// This is slightly trickier than expected to support a multi-IOIO use-case.
 		runOnUiThread(new Runnable() {
@@ -35,21 +42,13 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
 			public void run() {
 				if (enable) {
 					if (numConnected_++ == 0) {
-						//ToggleButtons.get("led").setEnabled(true);
-						//for( Entry<String, ToggleButton> entry : ToggleButtons.entrySet()){
-						//	entry.getValue().setEnabled(true);
-						//}
 						graph0.setEnabled(true);
 						sw_knob0.setEnabled(true);
 					}
 				} else {
 					if (--numConnected_ == 0) {
 						graph0.setEnabled(false);
-						sw_knob0.setEnabled(false);
-						//ToggleButtons.get("led").setEnabled(false);
-						//for( Entry<String, ToggleButton> entry : ToggleButtons.entrySet()){
-						//	entry.getValue().setEnabled(false);
-						//}						
+						sw_knob0.setEnabled(false);						
 					}
 				}
 			}
@@ -61,45 +60,33 @@ public class _IOIOLooper extends BaseIOIOLooper {
 		public AnalogInput ioiopina;  //31-46
 		private int pin_num;
 		private float RefVolts = (float) 3.3;
+		public ArrayList<Float> samples = null;
 		
 		AnalogPin(int PinNum) {
 			pin_num = PinNum;
 			try {					
-				if(PinNum <= 46 && PinNum >= 31){	
+				if(PinNum <= 46 && PinNum >= 31){
+					samples = new ArrayList<Float>();					
 					ioiopina = ioio_.openAnalogInput(PinNum);
-					ioiopina.setBuffer(256);
-					//float sr = ioiopina.getSampleRate();			//in Hz units.		
-					//RefVolts = ioiopina.getReference();
-					//toast("Reference Voltage: " + RefVolts+", SampleRate: "+sr );				
+					ioiopina.setBuffer(256);					
+					//float sr = ioiopina.getSampleRate();			//in Hz units.				
 				}
 				
 			} catch (ConnectionLostException e) {
 				
 			}		
 		}
-		public float readAnalogInBuffered() throws InterruptedException, ConnectionLostException{
-			float v = 0;
-			//float val = 0;			
-			//printAnalogDroppedSamples(aIn0);
-			//int numSampleToRead = ioiopina.available();
-			//for(int i=0;i<numSampleToRead;i++){	//reads all available samples
-				v = ioiopina.getVoltageBuffered();
-				//val = ioiopina.readBuffered();
-				//toast("Voltage: "+v+", Value: "+val);				
-			//}
-			return v;
+		public void readAnalogInBuffered() throws InterruptedException, ConnectionLostException{
+			int numSampleToRead = ioiopina.available();
+			for(int i=0;i<numSampleToRead;i++){	//reads all available samples
+				samples.add( ioiopina.getVoltageBuffered() );		
+			}
 		}
-		public float readAnalogInUnBuffered() throws InterruptedException, ConnectionLostException{
-			float v = 0;
-			//float val = 0;			
-			//printDroppedSamples();
-			//int numSampleToRead = ioiopina.available();
-			//for(int i=0;i<numSampleToRead;i++){	//reads all available samples
-				v = ioiopina.getVoltage();
-				//val = ioiopina.read();
-				//toast("Voltage: "+v+", Value: "+val);
-			//}
-			return v;			
+		public void readAnalogInUnBuffered() throws InterruptedException, ConnectionLostException{
+			int numSampleToRead = ioiopina.available();
+			for(int i=0;i<numSampleToRead;i++){	//reads all available samples
+				samples.add( ioiopina.getVoltage() );
+			}			
 		}
 		public void setRefVolts(float volts){
 			RefVolts = (float) volts;
@@ -114,7 +101,7 @@ public class _IOIOLooper extends BaseIOIOLooper {
 		}	
 	}
 	public void interrupted() {
-		//enableUi(false);        //interrupted
+		enableUi(false);        //interrupted
 		if(show_toast_connection_info) toast("IOIO interrupted"); 		
 	}
 
@@ -124,10 +111,9 @@ public class _IOIOLooper extends BaseIOIOLooper {
 			enableUi(true);
 			showVersions(ioio_, "IOIO connected!");	 
 			AnalogPins = new HashMap<String, AnalogPin>();
-			//Twi_proxies = new HashMap<String, Twi_proxy>();
 			
 			//OutputPins.put("led", new OutputPin(0,3,false));  //mode 3 = open_collector
-			Thread.sleep(250);
+			//Thread.sleep(250);
 			//OutputPins.get("led").writeBit(true);  //mode 3 = open_collector
 			for(int i=0;i<16;i++){
 				AnalogPins.put("AN"+i, new AnalogPin(i+31));				
@@ -152,10 +138,12 @@ public class _IOIOLooper extends BaseIOIOLooper {
 	@Override
 	public void loop() {		
 		try {
-			//see if any buttons changed and update output			
-			//for( Entry<String, com.bmt.ioio_demo.MainActivity._IOIOLooper.AnalogPin> entry : AnalogPins.entrySet()){								
-				//if(entry.getKey().contentEquals("led")){}				
-			//}
+			//read the analog pins			
+			for( Entry<String, AnalogPin> entry : AnalogPins.entrySet()){	
+				entry.getValue().readAnalogInBuffered();
+				graph_pin(entry.getKey());				
+			}
+			Thread.sleep(128);
 		} catch (Exception e) {
 			toast("loop Error: "+e.getMessage()+" , "+e.getLocalizedMessage() );
 			//interrupted();
@@ -167,8 +155,14 @@ public class _IOIOLooper extends BaseIOIOLooper {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.graph_activity);
-		//sw_knob0 = (UIKnobSwitch) findViewById(R.id.sw_knob0);
-		//graph0 = (UIGraphView) findViewById(R.id.graph0);
+		sw_knob0 = (UIKnobSwitch) findViewById(R.id.sw_knob0);
+		sw_knob0.SetListener(new UIKnobSwitchListener(){
+			@Override
+			public void onChange(int position) {
+				toast("Knob position: "+position);
+			}			
+		});
+		graph0 = (UIGraphView) findViewById(R.id.graph0);
 	}	
 	@Override
 	protected void onResume() {
