@@ -6,19 +6,22 @@
 
 package com.bmt.customviews;
 
+import com.bmt.customviews.UIKnobSwitch.UIKnobSwitchListener;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector.OnGestureListener;
+import android.view.MotionEvent;
 import android.view.View;
 
 
-public class UIGraphView extends View {
+public class UIGraphView extends View implements OnGestureListener{
 	private Path border_path = null;
 	private Path graph_lines_path = null;
 	
@@ -29,7 +32,15 @@ public class UIGraphView extends View {
 	private Paint border_paint = null;
 	private Paint graph_lines_paint = null;
 	private Paint graph_text_paint = null;
-
+	
+	public interface UIGraphViewListener {
+		public void onScrollUpdate(int position);
+	}
+	private UIGraphViewListener m_listener = null;
+	public void SetListener(UIGraphViewListener uiGraphViewListener) {
+		m_listener = uiGraphViewListener;
+	}
+	
 	private void setPaintDefaults(Paint p, String c){
 		p.setAntiAlias(true);
 		p.setDither(true);
@@ -119,26 +130,7 @@ public class UIGraphView extends View {
 			drawLines(ctx, points);
 			ctx.restore();
 		}
-	}
-	/*
-	public void setBrush(Context context, AttributeSet attrs) {		
-		Log.i(tag, "graph view using attrs");
-			TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.UIGraphView, 0, 0);
-		   try {
-			   	defaultBrush.setAntiAlias(a.getBoolean(R.styleable.UIGraphView_AntiAlias, false));
-			   	defaultBrush.setAlpha(a.getInteger(R.styleable.UIGraphView_Alpha, 255));
-				//setUIGraphView_Color(a.getInteger(R.styleable.UIGraphView_Color, Color.BLACK));
-				//setUIGraphView_Color( Color.parseColor( a.getString(R.styleable.UIGraphView_Color) ));
-			   	defaultBrush.setDither(a.getBoolean(R.styleable.UIGraphView_Dither, true));
-			   	defaultBrush.setStrokeCap(a.getInteger(R.styleable.UIGraphView_StrokeCap, 0));
-			   	defaultBrush.setStrokeWidth(a.getInteger(R.styleable.UIGraphView_StrokeWidth, 2));
-			   	defaultBrush.setPaintStyle(a.getInteger(R.styleable.UIGraphView_Paint_Style, 0));
-			   	defaultBrush.setStrokeJoin(a.getInteger(R.styleable.UIGraphView_StrokeJoin, 0));
-				
-		   } finally {
-		       a.recycle();
-		   }		
-	}*/	
+	}	
 	public UIGraphView(Context c) {
 		super(c);
 		setupPaint();
@@ -154,7 +146,20 @@ public class UIGraphView extends View {
 		setupPaint();	
 		//setBrush(context, attrs);
 	}	
-	
+	public void drawlines(float[] f, int c){
+		line_chart lc = new line_chart();
+		lc._BitmapPaint.setColor(c);
+		if(f.length <= tiCanvas.getWidth()){
+			lc.drawValues(tiCanvas, f, 75);
+		} else {
+			int diff = f.length - tiCanvas.getWidth() - 1;
+			float[] _f = new float[tiCanvas.getWidth()];
+			for(int i=0;i<tiCanvas.getWidth();i++){
+				_f[i] = f[i+diff];
+			}
+			lc.drawValues(tiCanvas, _f, 75);
+		}
+	}
 	protected void drawGraphLines(int numlinesX, int numlinesY, int leftOffset, int bottomOffset){
 		int width = tiCanvas.getWidth();
 		int height = tiCanvas.getHeight();
@@ -182,25 +187,14 @@ public class UIGraphView extends View {
 			tiCanvas.drawText( v.substring(0, 4), 20, (divisor*(i+1))+(graph_text_paint.getTextSize()/2), graph_text_paint);// determine text box size?	
 		}
 		tiCanvas.drawText("0", 20, height, graph_text_paint);// determine text box size?
-		
-		//tiPath.moveTo(leftOffset, 0 );	//top left corner
-		//tiPath.lineTo(width, height); //bottom right corner
-		
-		//tiPath.moveTo(leftOffset, height/2 );	//center horizontal line
-		//tiPath.lineTo(width, height/2);
-		
-		//tiPath.moveTo((width+leftOffset)/2, 0 );	//center vertical line
-		//tiPath.lineTo((width+leftOffset)/2, height); 		//bottom right corner
 		tiCanvas.drawPath(graph_lines_path, graph_lines_paint);	
 		//prepare and draw sine wave
 		if(isInEditMode()){
-			line_chart lc = new line_chart();
-			lc._BitmapPaint.setColor(Color.BLUE);
 			float[] v = new float[width-leftOffset];
 			for(int i=0;i<width-leftOffset;i++){
 				v[i] = (float) (1.65 * Math.sin(i*0.05) + 1.65); //.017 rad = 1 deg
 			}
-			lc.drawValues(tiCanvas, v, 75);
+			drawlines(v, Color.RED);			
 		}
 	}
 	@Override
@@ -230,16 +224,56 @@ public class UIGraphView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.drawBitmap(background_bitmap, 0, 0, border_paint);
-		if (border_path != null){
+		/*if (border_path != null){
 			canvas.drawPath(border_path, border_paint);
 		}
 		if(graph_lines_path != null){
 			canvas.drawPath(graph_lines_path, graph_lines_paint);
-		}
+		}*/
 	}
 
 	public void clear() {
 		background_bitmap.eraseColor(Color.TRANSPARENT);	//don't want to erase backgroundImage, commenting doesn't erase anything
+		tiCanvas.drawPath(border_path, border_paint);
+		drawGraphLines(4, 4, 75, 0);
 		invalidate();
+	}
+/*
+abstract boolean 	onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
+					Notified when a scroll occurs with the initial on down MotionEvent and the current move MotionEvent.
+ */
+	@Override
+	public boolean onScroll(MotionEvent ondown, MotionEvent currentMove, float distanceX, float distanceY) {
+			float x = ondown.getX() / ((float) getWidth());
+			float y = ondown.getY() / ((float) getHeight());
+			float xScroll = currentMove.getX()  / ((float) getWidth());
+			float yScroll = currentMove.getY()  / ((float) getHeight());
+			//e2.getYPrecision()			
+			//float mm = e2.getTouchMajor() + e2.getTouchMinor();
+			
+			//TODO have to shift the data backwards and forwards invalidate then a refresh draw
+			//pulling data from ? with the ability to pull using start offset and end offset
+			//getting chunks the same size as the available graph area that is
+			//width-leftOffset
+		return false;
+	}
+	
+	@Override
+	public boolean onDown(MotionEvent arg0) {
+		return false;
+	}
+	@Override
+	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,	float arg3) {
+		return false;
+	}
+	@Override
+	public void onLongPress(MotionEvent arg0) {		
+	}	
+	@Override
+	public void onShowPress(MotionEvent arg0) {		
+	}
+	@Override
+	public boolean onSingleTapUp(MotionEvent arg0) {
+		return false;
 	}
 }

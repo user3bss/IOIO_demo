@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import com.bmt.customviews.UIGraphView;
+import com.bmt.customviews.UIGraphView.UIGraphViewListener;
 import com.bmt.customviews.UIKnobSwitch;
 import com.bmt.customviews.UIKnobSwitch.UIKnobSwitchListener;
 import com.bmt.ioio_demo.GraphActivity._IOIOLooper.AnalogPin;
@@ -31,9 +33,72 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
 	boolean show_toast_connection_info = true;
 	UIKnobSwitch sw_knob0 = null;
 	UIGraphView graph0 = null;
-
-	private void graph_pin(String pin){
-		//graph0.
+	private void clear_graph(){	
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				graph0.clear();
+			}
+		});		
+	}
+	private void graph_pin(AnalogPin p){
+		int color = Color.BLACK;			
+		switch(p.pin_num){
+			case 31:
+				color = Color.parseColor("#FF0000");
+				break;
+			case 32:
+				color = Color.parseColor("#FF5500");
+				break;
+			case 33:
+				color = Color.parseColor("#FFAA00");
+				break;				
+			case 34:
+				color = Color.parseColor("#FFFF00");
+				break;				
+			case 35:
+				color = Color.parseColor("#AAFF00");
+				break;
+			case 36:
+				color = Color.parseColor("#55FF00");
+				break;
+			case 37:
+				color = Color.parseColor("#00FF00");
+				break;
+			case 38:
+				color = Color.parseColor("#00FF55");
+				break;
+			case 39:
+				color = Color.parseColor("#00FFAA");
+				break;
+			case 40:
+				color = Color.parseColor("#00FFFF");
+				break;
+			case 41:
+				color = Color.parseColor("#00AAFF");
+				break;
+			case 42:
+				color = Color.parseColor("#0055FF");
+				break;
+			case 43:
+				color = Color.parseColor("#0000FF");
+				break;
+			case 44:
+				color = Color.parseColor("#5500FF");
+				break;
+			case 45:
+				color = Color.parseColor("#AA00FF");
+				break;
+			case 46:
+				color = Color.parseColor("#FF00FF");
+				break;
+		
+		}
+		float[] f = new float[p.samples.size()];
+		for(int i=0;i<p.samples.size();i++){
+			f[i] = p.samples.get(i);
+		}
+		graph0.drawlines(f, color);		
 	}
 	private void enableUi(final boolean enable) {
 		// This is slightly trickier than expected to support a multi-IOIO use-case.
@@ -138,10 +203,11 @@ public class _IOIOLooper extends BaseIOIOLooper {
 	@Override
 	public void loop() {		
 		try {
+			clear_graph();
 			//read the analog pins			
 			for( Entry<String, AnalogPin> entry : AnalogPins.entrySet()){	
 				entry.getValue().readAnalogInBuffered();
-				graph_pin(entry.getKey());				
+				graph_pin(entry.getValue());				
 			}
 			Thread.sleep(128);
 		} catch (Exception e) {
@@ -163,6 +229,13 @@ public class _IOIOLooper extends BaseIOIOLooper {
 			}			
 		});
 		graph0 = (UIGraphView) findViewById(R.id.graph0);
+		graph0.SetListener(new UIGraphViewListener(){
+			@Override
+			public void onScrollUpdate(int position) {
+				//using callback for fling bc this instance 
+				//has a referance to graph0 and the sample data
+			}			
+		});
 	}	
 	@Override
 	protected void onResume() {

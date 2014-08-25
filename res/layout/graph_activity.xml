@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.bmt.ioio_demo"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal" xmlns:app="http://schemas.android.com/apk/res/com.bmt.ioio_demo">
+    android:orientation="horizontal" >
 
     <com.bmt.customviews.UIGraphView
         android:id="@+id/graph0"
-        android:layout_width="720dp"
-        android:layout_height="250dp"
+        android:layout_width="282dp"
+        android:layout_height="129dp"
         android:layout_margin="10dp"
+        android:layout_weight="0.30"
         app:BorderColor="#00FF00"
         app:BorderStrokeWidth="5"
         app:LineColor="#3C3C3C"
@@ -16,8 +18,8 @@
 
     <com.bmt.customviews.UIKnobSwitch
         android:id="@+id/sw_knob0"
-        android:layout_width="260dp"
-        android:layout_height="250dp"
+        android:layout_width="141dp"
+        android:layout_height="134dp"
         android:layout_margin="10dp"
         app:position="0" />
 
