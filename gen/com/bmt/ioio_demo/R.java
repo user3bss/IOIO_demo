@@ -17,23 +17,6 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int AN0Color=0x7f010004;
-        /** <p>Must be an integer value, such as "<code>100</code>".
-<p>This may also be a reference to a resource (in the form
-"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
-theme attribute (in the form
-"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
-containing a value of this type.
-         */
-        public static final int AN0StrokeWidth=0x7f010005;
-        /** <p>Must be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
-"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
-<p>This may also be a reference to a resource (in the form
-"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
-theme attribute (in the form
-"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
-containing a value of this type.
-         */
         public static final int BorderColor=0x7f010000;
         /** <p>Must be an integer value, such as "<code>100</code>".
 <p>This may also be a reference to a resource (in the form
@@ -43,6 +26,14 @@ theme attribute (in the form
 containing a value of this type.
          */
         public static final int BorderStrokeWidth=0x7f010001;
+        /** <p>Must be an integer value, such as "<code>100</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int FontColor=0x7f010004;
         /** <p>Must be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
 "<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
 <p>This may also be a reference to a resource (in the form
@@ -60,6 +51,14 @@ theme attribute (in the form
 containing a value of this type.
          */
         public static final int LineStrokeWidth=0x7f010003;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int off_image=0x7f010007;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int on_image=0x7f010006;
         /** <p>Must be an integer value, such as "<code>100</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -67,7 +66,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int position=0x7f010007;
+        public static final int position=0x7f010008;
         /** <p>Must be a floating point value, such as "<code>1.2</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -75,15 +74,15 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int rotation=0x7f010006;
+        public static final int rotation=0x7f010005;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int rotor_image=0x7f010009;
+        public static final int rotor_image=0x7f01000a;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int stator_image=0x7f010008;
+        public static final int stator_image=0x7f010009;
     }
     public static final class drawable {
         public static final int dots=0x7f020000;
@@ -208,53 +207,22 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
            <colgroup align="left" />
            <colgroup align="left" />
            <tr><th>Attribute</th><th>Description</th></tr>
-           <tr><td><code>{@link #UIGraphView_AN0Color com.bmt.ioio_demo:AN0Color}</code></td><td></td></tr>
-           <tr><td><code>{@link #UIGraphView_AN0StrokeWidth com.bmt.ioio_demo:AN0StrokeWidth}</code></td><td></td></tr>
            <tr><td><code>{@link #UIGraphView_BorderColor com.bmt.ioio_demo:BorderColor}</code></td><td></td></tr>
            <tr><td><code>{@link #UIGraphView_BorderStrokeWidth com.bmt.ioio_demo:BorderStrokeWidth}</code></td><td></td></tr>
+           <tr><td><code>{@link #UIGraphView_FontColor com.bmt.ioio_demo:FontColor}</code></td><td></td></tr>
            <tr><td><code>{@link #UIGraphView_LineColor com.bmt.ioio_demo:LineColor}</code></td><td></td></tr>
            <tr><td><code>{@link #UIGraphView_LineStrokeWidth com.bmt.ioio_demo:LineStrokeWidth}</code></td><td></td></tr>
            </table>
-           @see #UIGraphView_AN0Color
-           @see #UIGraphView_AN0StrokeWidth
            @see #UIGraphView_BorderColor
            @see #UIGraphView_BorderStrokeWidth
+           @see #UIGraphView_FontColor
            @see #UIGraphView_LineColor
            @see #UIGraphView_LineStrokeWidth
          */
         public static final int[] UIGraphView = {
             0x7f010000, 0x7f010001, 0x7f010002, 0x7f010003,
-            0x7f010004, 0x7f010005
+            0x7f010004
         };
-        /**
-          <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#AN0Color}
-          attribute's value can be found in the {@link #UIGraphView} array.
-
-
-          <p>Must be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
-"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
-<p>This may also be a reference to a resource (in the form
-"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
-theme attribute (in the form
-"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
-containing a value of this type.
-          @attr name com.bmt.ioio_demo:AN0Color
-        */
-        public static final int UIGraphView_AN0Color = 4;
-        /**
-          <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#AN0StrokeWidth}
-          attribute's value can be found in the {@link #UIGraphView} array.
-
-
-          <p>Must be an integer value, such as "<code>100</code>".
-<p>This may also be a reference to a resource (in the form
-"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
-theme attribute (in the form
-"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
-containing a value of this type.
-          @attr name com.bmt.ioio_demo:AN0StrokeWidth
-        */
-        public static final int UIGraphView_AN0StrokeWidth = 5;
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#BorderColor}
           attribute's value can be found in the {@link #UIGraphView} array.
@@ -284,6 +252,20 @@ containing a value of this type.
           @attr name com.bmt.ioio_demo:BorderStrokeWidth
         */
         public static final int UIGraphView_BorderStrokeWidth = 1;
+        /**
+          <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#FontColor}
+          attribute's value can be found in the {@link #UIGraphView} array.
+
+
+          <p>Must be an integer value, such as "<code>100</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name com.bmt.ioio_demo:FontColor
+        */
+        public static final int UIGraphView_FontColor = 4;
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#LineColor}
           attribute's value can be found in the {@link #UIGraphView} array.
@@ -319,13 +301,37 @@ containing a value of this type.
            <colgroup align="left" />
            <colgroup align="left" />
            <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #UIKnob_off_image com.bmt.ioio_demo:off_image}</code></td><td></td></tr>
+           <tr><td><code>{@link #UIKnob_on_image com.bmt.ioio_demo:on_image}</code></td><td></td></tr>
            <tr><td><code>{@link #UIKnob_rotation com.bmt.ioio_demo:rotation}</code></td><td></td></tr>
            </table>
+           @see #UIKnob_off_image
+           @see #UIKnob_on_image
            @see #UIKnob_rotation
          */
         public static final int[] UIKnob = {
-            0x7f010006
+            0x7f010005, 0x7f010006, 0x7f010007
         };
+        /**
+          <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#off_image}
+          attribute's value can be found in the {@link #UIKnob} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name com.bmt.ioio_demo:off_image
+        */
+        public static final int UIKnob_off_image = 2;
+        /**
+          <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#on_image}
+          attribute's value can be found in the {@link #UIKnob} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name com.bmt.ioio_demo:on_image
+        */
+        public static final int UIKnob_on_image = 1;
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#rotation}
           attribute's value can be found in the {@link #UIKnob} array.
@@ -355,7 +361,7 @@ containing a value of this type.
            @see #UIKnobSwitch_stator_image
          */
         public static final int[] UIKnobSwitch = {
-            0x7f010007, 0x7f010008, 0x7f010009
+            0x7f010008, 0x7f010009, 0x7f01000a
         };
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#position}

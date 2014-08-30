@@ -15,9 +15,6 @@ import java.util.Map.Entry;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import com.bmt.customviews.UIGraphView;
@@ -27,12 +24,13 @@ import com.bmt.customviews.UIKnobSwitch.UIKnobSwitchListener;
 import com.bmt.ioio_demo.GraphActivity._IOIOLooper.AnalogPin;
 
 
-public class GraphActivity extends IOIOActivity implements OnClickListener{
+public class GraphActivity extends IOIOActivity{
 	HashMap<String, com.bmt.ioio_demo.GraphActivity._IOIOLooper.AnalogPin> AnalogPins = null;
 	private int numConnected_ = 0;
 	boolean show_toast_connection_info = true;
 	UIKnobSwitch sw_knob0 = null;
 	UIGraphView graph0 = null;
+	
 	private void clear_graph(){	
 		runOnUiThread(new Runnable() {
 			@Override
@@ -94,11 +92,12 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
 				break;
 		
 		}
+		//TODO need to filter samples according to scroll here??
 		float[] f = new float[p.samples.size()];
 		for(int i=0;i<p.samples.size();i++){
 			f[i] = p.samples.get(i);
 		}
-		graph0.drawlines(f, color);		
+		graph0.drawlines(f, color);
 	}
 	private void enableUi(final boolean enable) {
 		// This is slightly trickier than expected to support a multi-IOIO use-case.
@@ -124,7 +123,7 @@ public class _IOIOLooper extends BaseIOIOLooper {
 	class AnalogPin {
 		public AnalogInput ioiopina;  //31-46
 		private int pin_num;
-		private float RefVolts = (float) 3.3;
+		//private float RefVolts = (float) 3.3;
 		public ArrayList<Float> samples = null;
 		
 		AnalogPin(int PinNum) {
@@ -153,11 +152,11 @@ public class _IOIOLooper extends BaseIOIOLooper {
 				samples.add( ioiopina.getVoltage() );
 			}			
 		}
-		public void setRefVolts(float volts){
+		/*public void setRefVolts(float volts){
 			RefVolts = (float) volts;
 			if (volts > 3.3) 
 				Log.d(tag,"RefVolts set to higher than 3.3");
-		}
+		}*/
 		public void printDroppedSamples() throws ConnectionLostException{
 			int droppedSamples = ioiopina.getOverflowCount();
 			if(droppedSamples > 0){
@@ -209,12 +208,11 @@ public class _IOIOLooper extends BaseIOIOLooper {
 				entry.getValue().readAnalogInBuffered();
 				graph_pin(entry.getValue());				
 			}
-			Thread.sleep(128);
+			Thread.sleep(512);
 		} catch (Exception e) {
 			toast("loop Error: "+e.getMessage()+" , "+e.getLocalizedMessage() );
 			//interrupted();
 		}
-		//catch (ConnectionLostException e) {	}
 	}
 }
 	@Override
@@ -231,7 +229,7 @@ public class _IOIOLooper extends BaseIOIOLooper {
 		graph0 = (UIGraphView) findViewById(R.id.graph0);
 		graph0.SetListener(new UIGraphViewListener(){
 			@Override
-			public void onScrollUpdate(int position) {
+			public void onScrollUpdate(float x, float y, float xScroll, float yScroll) {
 				//using callback for fling bc this instance 
 				//has a referance to graph0 and the sample data
 			}			
@@ -269,11 +267,5 @@ public class _IOIOLooper extends BaseIOIOLooper {
 	@Override
 	protected IOIOLooper createIOIOLooper() {
 		return new _IOIOLooper();
-	}
-	
-	@Override
-	public void onClick(View arg0) {
-		
-		
 	}
 }

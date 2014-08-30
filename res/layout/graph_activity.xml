@@ -10,17 +10,12 @@
         android:layout_width="282dp"
         android:layout_height="129dp"
         android:layout_margin="10dp"
-        android:layout_weight="0.30"
-        app:BorderColor="#00FF00"
-        app:BorderStrokeWidth="5"
-        app:LineColor="#3C3C3C"
-        app:LineStrokeWidth="5" />
+        android:layout_weight="0.30" />
 
     <com.bmt.customviews.UIKnobSwitch
         android:id="@+id/sw_knob0"
         android:layout_width="141dp"
         android:layout_height="134dp"
-        android:layout_margin="10dp"
-        app:position="0" />
+        android:layout_margin="10dp" />
 
 </LinearLayout>

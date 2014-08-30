@@ -154,26 +154,20 @@ public class UIKnob extends View implements OnGestureListener {
 		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);	
 		c = context;
 		setBitmaps();						
-	}	
+	}
 	private void setPaintOptions(Context context, AttributeSet attrs) {		
 		Log.i(tag, "using attrs");
-		   c = context;
-		   setBitmaps();
+		setPaintOptions(context);		
 			TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.UIKnob, 0, 0);
-		   try {	       
-				tiBitmapPaint = new Paint();
-				/*setUIPaintView_AntiAlias(a.getBoolean(R.styleable.UIPaintView_AntiAlias, false));
-				setUIPaintView_Alpha(a.getInteger(R.styleable.UIPaintView_Alpha, 255));
-				setUIPaintView_Color(a.getInteger(R.styleable.UIPaintView_Color, 0));
-				setUIPaintView_Dither(a.getBoolean(R.styleable.UIPaintView_Dither, false));
-				setUIPaintView_StrokeCap(a.getInteger(R.styleable.UIPaintView_StrokeCap, 0));
-				setUIPaintView_StrokeWidth(a.getInteger(R.styleable.UIPaintView_StrokeWidth, 2));
-				setUIPaintView_Paint_Style(a.getInteger(R.styleable.UIPaintView_Paint_Style, 0));
-				setUIPaintView_StrokeJoin(a.getInteger(R.styleable.UIPaintView_StrokeJoin, 0));
-				*/
-		   } finally {
-		       a.recycle();
-		   }
+			   try {
+				   	int angle = a.getInt(R.styleable.UIKnob_rotation, 2);
+				   	setRotorPosAngle(angle);
+					//set_stator_image(a.getResourceId(R.styleable.UIKnob_on_image, R.drawable.rotoron));
+					//set_rotor_image(a.getResourceId(R.styleable.UIKnob_off_image, R.drawable.rotoroff));
+					invalidate();
+			   } finally {
+			       a.recycle();
+			   }
 		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);		  
 	}	
 

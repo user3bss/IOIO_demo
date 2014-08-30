@@ -5,11 +5,12 @@
        <attr name = "BorderStrokeWidth" format="integer" />
        <attr name = "LineColor" format = "color" />
        <attr name = "LineStrokeWidth" format = "integer" />
-       <attr name = "AN0Color" format = "color" />
-       <attr name = "AN0StrokeWidth" format = "integer" />           
+       <attr name = "FontColor" format = "color" />           
    </declare-styleable>
    <declare-styleable name="UIKnob"> 
-       <attr name="rotation" format="float" />       
+       <attr name="rotation" format="float" />
+       <attr name="on_image" format="reference"/>
+       <attr name="off_image" format="reference" />              
    </declare-styleable>
    <declare-styleable name="UIKnobSwitch"> 
        <attr name="position" format="integer" /> 

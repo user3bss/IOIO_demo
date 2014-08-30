@@ -6,9 +6,8 @@
 
 package com.bmt.customviews;
 
-import com.bmt.customviews.UIKnobSwitch.UIKnobSwitchListener;
-
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -19,6 +18,9 @@ import android.util.Log;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.bmt.GraphView.line_chart;
+import com.bmt.ioio_demo.R;
 
 
 public class UIGraphView extends View implements OnGestureListener{
@@ -32,9 +34,11 @@ public class UIGraphView extends View implements OnGestureListener{
 	private Paint border_paint = null;
 	private Paint graph_lines_paint = null;
 	private Paint graph_text_paint = null;
+	protected int leftOffset = 75;
+	protected int textLeftPadding = 20;
 	
 	public interface UIGraphViewListener {
-		public void onScrollUpdate(int position);
+		public void onScrollUpdate(float x, float y, float xScroll, float yScroll);
 	}
 	private UIGraphViewListener m_listener = null;
 	public void SetListener(UIGraphViewListener uiGraphViewListener) {
@@ -50,7 +54,7 @@ public class UIGraphView extends View implements OnGestureListener{
 		p.setStrokeCap(Paint.Cap.ROUND);
 		p.setStrokeWidth(2);
 		p.setAlpha(255);		
-	}
+	}	
 	private void setupPaint(){
 		border_paint = new Paint();
 		setPaintDefaults(border_paint, "#000000");
@@ -61,75 +65,30 @@ public class UIGraphView extends View implements OnGestureListener{
 		graph_text_paint = new Paint();
 		setPaintDefaults(graph_text_paint, "#000000");		
 	}
-	private class line_chart{
-		public Paint _BitmapPaint = null;
-		line_chart(){
-			_BitmapPaint = new Paint();
-			_BitmapPaint.setAntiAlias(true);
-			_BitmapPaint.setDither(true);
-			_BitmapPaint.setColor(Color.BLACK);
-			_BitmapPaint.setStyle(Paint.Style.STROKE);
-			_BitmapPaint.setStrokeJoin(Paint.Join.ROUND);
-			_BitmapPaint.setStrokeCap(Paint.Cap.ROUND);
-			_BitmapPaint.setStrokeWidth(2);
-			_BitmapPaint.setAlpha(255);
-		}
-		public void drawPoints(Canvas ctx, float[] points){
-			//ctx.drawPoints(points, 0, points.length, _BitmapPaint);			
-			for(int i=0;i<points.length;i+=2){
-				Path l = new Path();
-				l.moveTo(points[i], points[i+1]);				
-				l.lineTo(points[i], points[i+1]);
-				ctx.drawPath(l, _BitmapPaint);
-			}			
-		}
-		public void drawLines(Canvas ctx, float[] points){
-			//ctx.drawPoints(points, 0, points.length, _BitmapPaint);
-			Path l = new Path();
-			l.moveTo(points[0], points[1]);			
-			for(int i=2;i<points.length;i+=2){				
-				l.lineTo(points[i], points[i+1]);				
-			}
-			ctx.drawPath(l, _BitmapPaint);			
-		}		
-		private float min(float[] values){
-			float min = 100000000;
-			for(int i=0;i<values.length;i++){
-				if(values[i] < min){
-					min = values[i];
-				}
-			}
-			return min;
-		}
-		private float max(float[] values){
-			float max = -100000000;
-			for(int i=0;i<values.length;i++){
-				if(values[i] > max){
-					max = values[i];
-				}
-			}
-			return max;
-		}		
-		public void drawValues(Canvas ctx, float[] values, int leftOffset){
-			float[] points = new float[values.length*2];
-			int w = ctx.getWidth() - leftOffset;
-			int h = ctx.getHeight();
-			int sample_rate = 1000;
-			double yScale = (h / 3.3);
-			//double xTime_Per_Pixel = w / sample_rate; //640px-75px/1khz = .565s resolution
-			ctx.save();
-			ctx.scale(1,-1,w/2,h/2);
-			
-			//values.length <= chart_available_width
-			int pointINDX = 0;
-			for(int i =0;i<values.length;i++){
-				points[pointINDX++] = leftOffset+i;			//each value = 1px
-				points[pointINDX++] = (float) (values[i] * yScale);
-			}
-			//drawPoints(ctx, points);
-			drawLines(ctx, points);
-			ctx.restore();
-		}
+	private void setPaintOptions(Context context, AttributeSet attrs) {		
+		Log.i(tag, "using attrs");
+		setupPaint();		   
+			TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.UIGraphView, 0, 0);
+			   try {
+				   	int borderColor = a.getColor(R.styleable.UIGraphView_BorderColor, Color.parseColor("#000000"));
+				   	border_paint.setColor(borderColor);
+				   	
+				   	int borderStrokeWidth = a.getInt(R.styleable.UIGraphView_BorderStrokeWidth, 1);
+				   	border_paint.setStrokeWidth(borderStrokeWidth);
+				   	
+				   	int graph_linesColor = a.getColor(R.styleable.UIGraphView_LineColor, Color.parseColor("#3c3c3c"));
+				   	graph_lines_paint.setColor(graph_linesColor);
+				   	
+				   	int graph_linesStrokeWidth = a.getInt(R.styleable.UIGraphView_LineStrokeWidth, 2);
+				   	graph_lines_paint.setStrokeWidth(graph_linesStrokeWidth);
+				   	
+				   	int textColor = a.getColor(R.styleable.UIGraphView_FontColor, Color.parseColor("#000000"));
+				   	graph_text_paint.setColor(textColor);				   	
+					//invalidate();
+			   } finally {
+			       a.recycle();
+			   }
+		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);		  
 	}	
 	public UIGraphView(Context c) {
 		super(c);
@@ -137,28 +96,37 @@ public class UIGraphView extends View implements OnGestureListener{
 	}
 	public UIGraphView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		setupPaint();		
-		//setBrush(context, attrs);		
+		setPaintOptions(context, attrs);		
 	}
 
 	public UIGraphView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		setupPaint();	
-		//setBrush(context, attrs);
+		setPaintOptions(context, attrs);
 	}	
 	public void drawlines(float[] f, int c){
 		line_chart lc = new line_chart();
 		lc._BitmapPaint.setColor(c);
 		if(f.length <= tiCanvas.getWidth()){
-			lc.drawValues(tiCanvas, f, 75);
+			lc.drawValues(tiCanvas, f, leftOffset);
 		} else {
+			//try to read a section of data
+			//f.length > width for 1pps
 			int diff = f.length - tiCanvas.getWidth() - 1;
+			//(f.length - width) could be much more than width 
 			float[] _f = new float[tiCanvas.getWidth()];
 			for(int i=0;i<tiCanvas.getWidth();i++){
 				_f[i] = f[i+diff];
 			}
-			lc.drawValues(tiCanvas, _f, 75);
+			lc.drawValues(tiCanvas, _f, leftOffset);
 		}
+	}
+	protected void drawYAxisLabels(int numlinesY, int leftOffset, float divisor, float divisorV){
+		tiCanvas.drawText("3.3", textLeftPadding, 0+graph_text_paint.getTextSize(), graph_text_paint);// determine text box size?
+		for(int i=0;i<numlinesY-1;i++){			
+			String v = ((3.3/numlinesY)*(numlinesY-i-1))+"";
+			tiCanvas.drawText( v.substring(0, 4), textLeftPadding, (divisor*(i+1))+(graph_text_paint.getTextSize()/2), graph_text_paint);// determine text box size?	
+		}
+		tiCanvas.drawText("0", textLeftPadding, tiCanvas.getHeight(), graph_text_paint);// determine text box size?
 	}
 	protected void drawGraphLines(int numlinesX, int numlinesY, int leftOffset, int bottomOffset){
 		int width = tiCanvas.getWidth();
@@ -174,20 +142,14 @@ public class UIGraphView extends View implements OnGestureListener{
 		for(int i=0;i<numlinesY;i++){
 			graph_lines_path.moveTo(leftOffset, ((i+1)*divisor) );	//draw border
 			graph_lines_path.lineTo(width, ((i+1)*divisor));			
-		}
-		
+		}		
 		float divisorV = (width-leftOffset)/numlinesX;
-		
-		tiCanvas.drawText("3.3", 20, 0+graph_text_paint.getTextSize(), graph_text_paint);// determine text box size?
 		for(int i=0;i<numlinesY-1;i++){
 			graph_lines_path.moveTo(leftOffset+((i+1)*divisorV), 0 );
-			graph_lines_path.lineTo(leftOffset+((i+1)*divisorV), height );
-			
-			String v = ((3.3/numlinesY)*(numlinesY-i-1))+"";
-			tiCanvas.drawText( v.substring(0, 4), 20, (divisor*(i+1))+(graph_text_paint.getTextSize()/2), graph_text_paint);// determine text box size?	
+			graph_lines_path.lineTo(leftOffset+((i+1)*divisorV), tiCanvas.getHeight() );	
 		}
-		tiCanvas.drawText("0", 20, height, graph_text_paint);// determine text box size?
-		tiCanvas.drawPath(graph_lines_path, graph_lines_paint);	
+		tiCanvas.drawPath(graph_lines_path, graph_lines_paint);				
+		drawYAxisLabels( numlinesY, leftOffset, divisor, divisorV);		
 		//prepare and draw sine wave
 		if(isInEditMode()){
 			float[] v = new float[width-leftOffset];
@@ -197,6 +159,16 @@ public class UIGraphView extends View implements OnGestureListener{
 			drawlines(v, Color.RED);			
 		}
 	}
+	protected void draw_border(){
+		border_path = new Path();
+		border_path.moveTo(0, 0);	//draw border
+		border_path.lineTo(tiCanvas.getWidth(), 0);
+		border_path.lineTo(tiCanvas.getWidth(), tiCanvas.getHeight());
+		border_path.lineTo(0, tiCanvas.getHeight());
+		border_path.lineTo(0, 0);
+		tiCanvas.drawPath(border_path, border_paint);		
+	}
+	
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		//if(!isInEditMode()){		
@@ -204,19 +176,12 @@ public class UIGraphView extends View implements OnGestureListener{
 			super.onSizeChanged(w, h, oldw, oldh);
 			background_bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
 			tiCanvas = new Canvas(background_bitmap);
-			int width = tiCanvas.getWidth();
-			int height = tiCanvas.getHeight();
-			border_path = new Path();
-			border_path.moveTo(0, 0);	//draw border
-			border_path.lineTo(width, 0);
-			border_path.lineTo(width, height);
-			border_path.lineTo(0, height);
-			border_path.lineTo(0, 0);
-			tiCanvas.drawPath(border_path, border_paint);
+			draw_border();
+
 			//tiBitmapPaint.setTextSize(20);
 			//tiBitmapPaint.setShadowLayer(35, 0, 0, Color.DKGRAY);
 			//tiCanvas.drawText("drawText:"+tiBitmapPaint.measureText("drawText:"), 10, 20, tiBitmapPaint);// determine text box size?
-			drawGraphLines(4, 4, 75, 0);
+			drawGraphLines(4, 4, leftOffset, 0);
 			invalidate();
 		//}	
 	}	
@@ -235,7 +200,7 @@ public class UIGraphView extends View implements OnGestureListener{
 	public void clear() {
 		background_bitmap.eraseColor(Color.TRANSPARENT);	//don't want to erase backgroundImage, commenting doesn't erase anything
 		tiCanvas.drawPath(border_path, border_paint);
-		drawGraphLines(4, 4, 75, 0);
+		drawGraphLines(4, 4, leftOffset, 0);
 		invalidate();
 	}
 /*
@@ -255,6 +220,7 @@ abstract boolean 	onScroll(MotionEvent e1, MotionEvent e2, float distanceX, floa
 			//pulling data from ? with the ability to pull using start offset and end offset
 			//getting chunks the same size as the available graph area that is
 			//width-leftOffset
+			if (m_listener != null) m_listener.onScrollUpdate(x,y,xScroll, yScroll);
 		return false;
 	}
 	
