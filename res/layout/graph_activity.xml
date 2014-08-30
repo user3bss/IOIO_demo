@@ -10,7 +10,9 @@
         android:layout_width="282dp"
         android:layout_height="129dp"
         android:layout_margin="10dp"
-        android:layout_weight="0.30" />
+        android:layout_weight="0.30"
+        app:BorderStrokeWidth="2"
+        app:LineStrokeWidth="1" />
 
     <com.bmt.customviews.UIKnobSwitch
         android:id="@+id/sw_knob0"
