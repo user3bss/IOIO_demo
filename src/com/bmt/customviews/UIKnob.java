@@ -158,17 +158,17 @@ public class UIKnob extends View implements OnGestureListener {
 	private void setPaintOptions(Context context, AttributeSet attrs) {		
 		Log.i(tag, "using attrs");
 		setPaintOptions(context);		
-			TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.UIKnob, 0, 0);
-			   try {
-				   	int angle = a.getInt(R.styleable.UIKnob_rotation, 2);
-				   	setRotorPosAngle(angle);
-					//set_stator_image(a.getResourceId(R.styleable.UIKnob_on_image, R.drawable.rotoron));
-					//set_rotor_image(a.getResourceId(R.styleable.UIKnob_off_image, R.drawable.rotoroff));
-					invalidate();
-			   } finally {
-			       a.recycle();
-			   }
-		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);		  
+		TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.UIKnob, 0, 0);
+		   try {			   	
+				int r = a.getResourceId(R.styleable.UIKnob_on_image, R.drawable.rotoron);
+				rotorOn = BitmapFactory.decodeResource(context.getResources(), r);
+				r = a.getResourceId(R.styleable.UIKnob_off_image, R.drawable.rotoroff);
+				rotorOff = BitmapFactory.decodeResource(context.getResources(), r);
+				setRotorPercentage(a.getInt(R.styleable.UIKnob_value, 0));				
+				invalidate();
+		   } finally {
+		       a.recycle();
+		   }		  
 	}	
 
 	/**
@@ -217,7 +217,7 @@ public class UIKnob extends View implements OnGestureListener {
 		}
 	}
 	
-	public float getValue(){
+	public float getAngle(){
 		Log.i(tag, "Angle: "+mAngle);
 		return mAngle;
 	}

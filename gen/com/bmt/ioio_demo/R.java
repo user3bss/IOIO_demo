@@ -26,7 +26,8 @@ theme attribute (in the form
 containing a value of this type.
          */
         public static final int BorderStrokeWidth=0x7f010001;
-        /** <p>Must be an integer value, such as "<code>100</code>".
+        /** <p>Must be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
 theme attribute (in the form
@@ -54,11 +55,11 @@ containing a value of this type.
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int off_image=0x7f010007;
+        public static final int off_image=0x7f01000a;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int on_image=0x7f010006;
+        public static final int on_image=0x7f010009;
         /** <p>Must be an integer value, such as "<code>100</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -66,23 +67,23 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int position=0x7f010008;
-        /** <p>Must be a floating point value, such as "<code>1.2</code>".
+        public static final int position=0x7f010005;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int rotor_image=0x7f010007;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int stator_image=0x7f010006;
+        /** <p>Must be an integer value, such as "<code>100</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int rotation=0x7f010005;
-        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
-or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
-         */
-        public static final int rotor_image=0x7f01000a;
-        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
-or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
-         */
-        public static final int stator_image=0x7f010009;
+        public static final int value=0x7f010008;
     }
     public static final class drawable {
         public static final int dots=0x7f020000;
@@ -257,7 +258,8 @@ containing a value of this type.
           attribute's value can be found in the {@link #UIGraphView} array.
 
 
-          <p>Must be an integer value, such as "<code>100</code>".
+          <p>Must be a color value, in the form of "<code>#<i>rgb</i></code>", "<code>#<i>argb</i></code>",
+"<code>#<i>rrggbb</i></code>", or "<code>#<i>aarrggbb</i></code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
 theme attribute (in the form
@@ -303,14 +305,14 @@ containing a value of this type.
            <tr><th>Attribute</th><th>Description</th></tr>
            <tr><td><code>{@link #UIKnob_off_image com.bmt.ioio_demo:off_image}</code></td><td></td></tr>
            <tr><td><code>{@link #UIKnob_on_image com.bmt.ioio_demo:on_image}</code></td><td></td></tr>
-           <tr><td><code>{@link #UIKnob_rotation com.bmt.ioio_demo:rotation}</code></td><td></td></tr>
+           <tr><td><code>{@link #UIKnob_value com.bmt.ioio_demo:value}</code></td><td></td></tr>
            </table>
            @see #UIKnob_off_image
            @see #UIKnob_on_image
-           @see #UIKnob_rotation
+           @see #UIKnob_value
          */
         public static final int[] UIKnob = {
-            0x7f010005, 0x7f010006, 0x7f010007
+            0x7f010008, 0x7f010009, 0x7f01000a
         };
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#off_image}
@@ -333,19 +335,19 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         */
         public static final int UIKnob_on_image = 1;
         /**
-          <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#rotation}
+          <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#value}
           attribute's value can be found in the {@link #UIKnob} array.
 
 
-          <p>Must be a floating point value, such as "<code>1.2</code>".
+          <p>Must be an integer value, such as "<code>100</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name com.bmt.ioio_demo:rotation
+          @attr name com.bmt.ioio_demo:value
         */
-        public static final int UIKnob_rotation = 0;
+        public static final int UIKnob_value = 0;
         /** Attributes that can be used with a UIKnobSwitch.
            <p>Includes the following attributes:</p>
            <table>
@@ -361,7 +363,7 @@ containing a value of this type.
            @see #UIKnobSwitch_stator_image
          */
         public static final int[] UIKnobSwitch = {
-            0x7f010008, 0x7f010009, 0x7f01000a
+            0x7f010005, 0x7f010006, 0x7f010007
         };
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#position}

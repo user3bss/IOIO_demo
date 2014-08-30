@@ -97,7 +97,7 @@ public class GraphActivity extends IOIOActivity{
 		for(int i=0;i<p.samples.size();i++){
 			f[i] = p.samples.get(i);
 		}
-		graph0.drawlines(f, color);
+		graph0.drawLineChart(f, color);
 	}
 	private void enableUi(final boolean enable) {
 		// This is slightly trickier than expected to support a multi-IOIO use-case.
@@ -179,7 +179,8 @@ public class _IOIOLooper extends BaseIOIOLooper {
 			//OutputPins.put("led", new OutputPin(0,3,false));  //mode 3 = open_collector
 			//Thread.sleep(250);
 			//OutputPins.get("led").writeBit(true);  //mode 3 = open_collector
-			for(int i=0;i<16;i++){
+			//for(int i=0;i<16;i++){
+			for(int i=0;i<4;i++){ //try to limit pins until graph works
 				AnalogPins.put("AN"+i, new AnalogPin(i+31));				
 			}
 			//InputPin9 = new InputPin(9, 0); //0:pullup, 1:pulldn, 2:float

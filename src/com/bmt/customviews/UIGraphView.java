@@ -103,7 +103,7 @@ public class UIGraphView extends View implements OnGestureListener{
 		super(context, attrs, defStyle);
 		setPaintOptions(context, attrs);
 	}	
-	public void drawlines(float[] f, int c){
+	public void drawLineChart(float[] f, int c){
 		line_chart lc = new line_chart();
 		lc._BitmapPaint.setColor(c);
 		if(f.length <= tiCanvas.getWidth()){
@@ -156,7 +156,7 @@ public class UIGraphView extends View implements OnGestureListener{
 			for(int i=0;i<width-leftOffset;i++){
 				v[i] = (float) (1.65 * Math.sin(i*0.05) + 1.65); //.017 rad = 1 deg
 			}
-			drawlines(v, Color.RED);			
+			drawLineChart(v, Color.RED);			
 		}
 	}
 	protected void draw_border(){
