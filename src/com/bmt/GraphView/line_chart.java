@@ -1,5 +1,7 @@
 package com.bmt.GraphView;
 
+import java.util.ArrayList;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -58,7 +60,25 @@ public class line_chart{
 			points[pointINDX++] = leftOffset+i;			//each value = 1px
 			points[pointINDX++] = (float) (values[i] * yScale);
 		}
-		drawPoints(ctx, points);
+		drawLines(ctx, points);
 		//ctx.restore();
+	}
+	public void drawValues(Canvas ctx, ArrayList<Float> values, int leftOffset, int start, int end){
+		if(end <= values.size() && start >= 0){
+			int w = ctx.getWidth() - leftOffset;
+			int h = ctx.getHeight();
+			double yScale = (h / 3.3);
+			//ctx.save();
+			//ctx.scale(1,-1,w/2,h/2);  //have to invert the y axis 
+			//has bad affect on flipping text labels
+			Path l = new Path();
+			l.moveTo(leftOffset, (float) (values.get(0) * yScale));
+			int xCounter = leftOffset;
+			for(int i =start;i<end;i++){				
+				l.lineTo(xCounter++, (float) (values.get(i) * yScale));	
+			}
+			ctx.drawPath(l, _BitmapPaint);
+			//ctx.restore();
+		}
 	}
 }

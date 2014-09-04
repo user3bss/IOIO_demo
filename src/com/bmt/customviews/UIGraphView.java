@@ -6,6 +6,8 @@
 
 package com.bmt.customviews;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -36,6 +38,7 @@ public class UIGraphView extends View implements OnGestureListener{
 	private Paint graph_text_paint = null;
 	protected int leftOffset = 75;
 	protected int textLeftPadding = 20;
+	//private boolean isScrolling = false;
 	
 	public interface UIGraphViewListener {
 		public void onScrollUpdate(float x, float y, float xScroll, float yScroll);
@@ -68,27 +71,25 @@ public class UIGraphView extends View implements OnGestureListener{
 	private void setPaintOptions(Context context, AttributeSet attrs) {		
 		Log.i(tag, "using attrs");
 		setupPaint();		   
-			TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.UIGraphView, 0, 0);
-			   try {
-				   	int borderColor = a.getColor(R.styleable.UIGraphView_BorderColor, Color.parseColor("#000000"));
-				   	border_paint.setColor(borderColor);
-				   	
-				   	int borderStrokeWidth = a.getInt(R.styleable.UIGraphView_BorderStrokeWidth, 1);
-				   	border_paint.setStrokeWidth(borderStrokeWidth);
-				   	
-				   	int graph_linesColor = a.getColor(R.styleable.UIGraphView_LineColor, Color.parseColor("#3c3c3c"));
-				   	graph_lines_paint.setColor(graph_linesColor);
-				   	
-				   	int graph_linesStrokeWidth = a.getInt(R.styleable.UIGraphView_LineStrokeWidth, 2);
-				   	graph_lines_paint.setStrokeWidth(graph_linesStrokeWidth);
-				   	
-				   	int textColor = a.getColor(R.styleable.UIGraphView_FontColor, Color.parseColor("#000000"));
-				   	graph_text_paint.setColor(textColor);				   	
-					//invalidate();
-			   } finally {
-			       a.recycle();
-			   }
-		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);		  
+		TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.UIGraphView, 0, 0);
+		   try {
+			   	int borderColor = a.getColor(R.styleable.UIGraphView_BorderColor, Color.parseColor("#000000"));
+			   	border_paint.setColor(borderColor);
+			   	
+			   	int borderStrokeWidth = a.getInt(R.styleable.UIGraphView_BorderStrokeWidth, 1);
+			   	border_paint.setStrokeWidth(borderStrokeWidth);
+			   	
+			   	int graph_linesColor = a.getColor(R.styleable.UIGraphView_LineColor, Color.parseColor("#3c3c3c"));
+			   	graph_lines_paint.setColor(graph_linesColor);
+			   	
+			   	int graph_linesStrokeWidth = a.getInt(R.styleable.UIGraphView_LineStrokeWidth, 2);
+			   	graph_lines_paint.setStrokeWidth(graph_linesStrokeWidth);
+			   	
+			   	int textColor = a.getColor(R.styleable.UIGraphView_FontColor, Color.parseColor("#000000"));
+			   	graph_text_paint.setColor(textColor);
+		   } finally {
+		       a.recycle();
+		   }		  
 	}	
 	public UIGraphView(Context c) {
 		super(c);
@@ -108,18 +109,37 @@ public class UIGraphView extends View implements OnGestureListener{
 		lc._BitmapPaint.setColor(c);
 		if(f.length <= tiCanvas.getWidth()){
 			lc.drawValues(tiCanvas, f, leftOffset);
-		} else {
-			//try to read a section of data
-			//f.length > width for 1pps
-			int diff = f.length - tiCanvas.getWidth() - 1;
-			//(f.length - width) could be much more than width 
+		} else { //f.length > width read a section of data			
+			//int diff = f.length - tiCanvas.getWidth() - 1;		//(f.length - width) could be much more than width 
 			float[] _f = new float[tiCanvas.getWidth()];
-			for(int i=0;i<tiCanvas.getWidth();i++){
-				_f[i] = f[i+diff];
+			int start = f.length - tiCanvas.getWidth();			
+			int j = 0;
+			for(int i=start;i<f.length;i++){
+				_f[j++] = f[i];
 			}
 			lc.drawValues(tiCanvas, _f, leftOffset);
 		}
 	}
+	public void drawSamplesLineChart(ArrayList<Float> alf, int c){
+		line_chart lc = new line_chart();
+		lc._BitmapPaint.setColor(c);
+		if(alf != null && alf.size() > 0){
+			if(alf.size() <= tiCanvas.getWidth()){
+				lc.drawValues(tiCanvas, alf, leftOffset, 0, alf.size());
+			} else { //f.length > width read a section of data
+				lc.drawValues(tiCanvas, alf, leftOffset, alf.size()-(tiCanvas.getWidth()-leftOffset), alf.size());
+			}
+		}
+	}
+	public void drawSamplesLineChart(ArrayList<Float> alf, int c, int start, int end){
+		line_chart lc = new line_chart();
+		lc._BitmapPaint.setColor(c);
+		if(alf.size() <= tiCanvas.getWidth()){
+			lc.drawValues(tiCanvas, alf, leftOffset, 0, alf.size());
+		} else { //f.length > width read a section of data
+			lc.drawValues(tiCanvas, alf, leftOffset, start, end);
+		}
+	}	
 	protected void drawYAxisLabels(int numlinesY, int leftOffset, float divisor, float divisorV){
 		tiCanvas.drawText("3.3", textLeftPadding, 0+graph_text_paint.getTextSize(), graph_text_paint);// determine text box size?
 		for(int i=0;i<numlinesY-1;i++){			
@@ -175,13 +195,14 @@ public class UIGraphView extends View implements OnGestureListener{
 			Log.d(tag, "onSizeChanged: ");
 			super.onSizeChanged(w, h, oldw, oldh);
 			background_bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-			tiCanvas = new Canvas(background_bitmap);
+			tiCanvas = new Canvas(background_bitmap);			
 			draw_border();
 
 			//tiBitmapPaint.setTextSize(20);
 			//tiBitmapPaint.setShadowLayer(35, 0, 0, Color.DKGRAY);
 			//tiCanvas.drawText("drawText:"+tiBitmapPaint.measureText("drawText:"), 10, 20, tiBitmapPaint);// determine text box size?
 			drawGraphLines(4, 4, leftOffset, 0);
+			//tiCanvas.scale(1,-1,tiCanvas.getWidth()/2,tiCanvas.getHeight()/2);			
 			invalidate();
 		//}	
 	}	
@@ -200,7 +221,9 @@ public class UIGraphView extends View implements OnGestureListener{
 	public void clear() {
 		background_bitmap.eraseColor(Color.TRANSPARENT);	//don't want to erase backgroundImage, commenting doesn't erase anything
 		tiCanvas.drawPath(border_path, border_paint);
-		drawGraphLines(4, 4, leftOffset, 0);
+		//tiCanvas.drawPath(graph_lines_path, graph_lines_paint);
+		drawGraphLines(4, 4, leftOffset, 0); //have to draw text labels too
+		//tiCanvas.scale(1,-1,tiCanvas.getWidth()/2,tiCanvas.getHeight()/2);		
 		invalidate();
 	}
 /*

@@ -92,12 +92,12 @@ public class GraphActivity extends IOIOActivity{
 				break;
 		
 		}
-		//TODO need to filter samples according to scroll here??
-		float[] f = new float[p.samples.size()];
-		for(int i=0;i<p.samples.size();i++){
-			f[i] = p.samples.get(i);
-		}
-		graph0.drawLineChart(f, color);
+		graph0.drawSamplesLineChart(p.samples, color); //pass the data directly
+		//drawSamplesLineChart(p.samples, color, int start, int end);
+		
+		//TODO need to filter samples according to scroll here??		
+		//graph0.drawLineChart(p.getSamples(), color); //convert arraylist<float> to float[] 
+		//TODO use paging for render frames???
 	}
 	private void enableUi(final boolean enable) {
 		// This is slightly trickier than expected to support a multi-IOIO use-case.
@@ -139,6 +139,13 @@ public class _IOIOLooper extends BaseIOIOLooper {
 			} catch (ConnectionLostException e) {
 				
 			}		
+		}
+		public float[] getSamples(){
+			float[] f = new float[samples.size()];
+			for(int i=0;i<samples.size();i++){
+				f[i] = samples.get(i);
+			}
+			return f;
 		}
 		public void readAnalogInBuffered() throws InterruptedException, ConnectionLostException{
 			int numSampleToRead = ioiopina.available();
@@ -209,7 +216,8 @@ public class _IOIOLooper extends BaseIOIOLooper {
 				entry.getValue().readAnalogInBuffered();
 				graph_pin(entry.getValue());				
 			}
-			Thread.sleep(512);
+			Thread.sleep((1/60) * 1000); 
+			
 		} catch (Exception e) {
 			toast("loop Error: "+e.getMessage()+" , "+e.getLocalizedMessage() );
 			//interrupted();
