@@ -67,7 +67,7 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 		});
 	}
 	
-	public void setTextD9(){
+	/*public void setTextD9(){
 	    runOnUiThread(new Runnable() {
 	        @Override
 	        public void run() {
@@ -90,7 +90,7 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 				}	        	
 	        }
 	    });		
-	}	
+	}	*/
 	/*public void setLed(){
 	    runOnUiThread(new Runnable() {
 	        @Override
@@ -406,9 +406,9 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 			//OutputPins.put("D17",  new OutputPin(30,3,false));
 			
 			
-			for(int i=0;i<16;i++){
+			/*for(int i=0;i<16;i++){
 				AnalogPins.put("AN"+i, new AnalogPin(i+31));				
-			}
+			}*/
 			//toast("done settings up an0-15");
 			
 			//Spi_proxy Spi = new Spi_proxy();
@@ -464,13 +464,13 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 					}					
 				}
 			}
-			setTextD9(); //read inputpin 9 and set label			
+			//setTextD9(); //read inputpin 9 and set label			
 			//get analog inputs and display in text views			
 			//Thread.sleep(350); 			 //milliseconds, = 50 samples in buffer for analog
-			Thread.sleep(120); 			 //milliseconds, = 50 samples in buffer for analog
+			//Thread.sleep(120); 			 //milliseconds, = 50 samples in buffer for analog
 			
 			//Process Analog Inputs
-			for( Entry<String, AnalogPin> entry : AnalogPins.entrySet()){
+			/*for( Entry<String, AnalogPin> entry : AnalogPins.entrySet()){
 				float v = 0;
 				if(TextViews.containsKey(entry.getKey())){
 					v = entry.getValue().readAnalogInBuffered();
@@ -479,7 +479,7 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 				} else {
 					toast("no entry for ");
 				}
-			}
+			}*/
 									
 		} catch (Exception e) {
 			toast("loop Error: "+e.getMessage()+" , "+e.getLocalizedMessage() );
