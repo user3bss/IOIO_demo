@@ -232,7 +232,7 @@ public class _IOIOLooper extends BaseIOIOLooper {
 		sw_knob0.SetListener(new UIKnobSwitchListener(){
 			@Override
 			public void onChange(int position) {
-				toast("Knob position: "+position);
+				//toast("Knob position: "+position);
 			}			
 		});
 		graph0 = (UIGraphView) findViewById(R.id.graph0);
