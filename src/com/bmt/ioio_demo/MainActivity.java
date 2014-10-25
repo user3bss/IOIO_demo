@@ -517,7 +517,7 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 		
 		ToggleButtons.put("led", (ToggleButton) findViewById(R.id.toggleButtonLed));
 		
-		TextViews = new HashMap<String, TextView>();
+		/*TextViews = new HashMap<String, TextView>();
 		TextViews.put("AN0", (TextView) findViewById(R.id.AN0Text));
 		TextViews.put("AN1", (TextView) findViewById(R.id.AN1Text));
 		TextViews.put("AN2", (TextView) findViewById(R.id.AN2Text));
@@ -535,7 +535,7 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 		TextViews.put("AN13", (TextView) findViewById(R.id.AN13Text));
 		TextViews.put("AN14", (TextView) findViewById(R.id.AN14Text));
 		TextViews.put("AN15", (TextView) findViewById(R.id.AN15Text));
-		TextViews.put("D9", (TextView) findViewById(R.id.D9Text));
+		TextViews.put("D9", (TextView) findViewById(R.id.D9Text));*/
 
 		//Disable the buttons
 		for( Entry<String, ToggleButton> entry : ToggleButtons.entrySet()){

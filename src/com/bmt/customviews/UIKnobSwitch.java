@@ -203,7 +203,7 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		
 		Matrix matrix = new Matrix();
 		matrix.postScale(scale, scale);
-		matrix.postRotate(mAngle, this.getWidth()/2, this.getWidth()/2);				
+		matrix.postRotate(mAngle, (this.getWidth()/metrics.scaledDensity)/2, (this.getWidth()/metrics.scaledDensity)/2);				
 		canvas.drawBitmap(rotor, matrix, tiBitmapPaint);				
 		
 		if (tiPath != null) {
