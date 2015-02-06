@@ -1,4 +1,4 @@
-package com.bmt.GraphView;
+package com.bmt.custom_classes;
 
 public class Math {
 	public float min(float[] values){

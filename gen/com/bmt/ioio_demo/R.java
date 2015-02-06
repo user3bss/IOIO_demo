@@ -52,6 +52,22 @@ theme attribute (in the form
 containing a value of this type.
          */
         public static final int LineStrokeWidth=0x7f010003;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int ison=0x7f01000b;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int ledoff_image=0x7f01000d;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int ledon_image=0x7f01000c;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
@@ -92,63 +108,64 @@ containing a value of this type.
         public static final int ioio_down=0x7f020003;
         public static final int ioioboard=0x7f020004;
         public static final int knob=0x7f020005;
-        public static final int rotoroff=0x7f020006;
-        public static final int rotoron=0x7f020007;
-        public static final int stator=0x7f020008;
-        public static final int statorswitch=0x7f020009;
+        public static final int ledoff=0x7f020006;
+        public static final int ledon=0x7f020007;
+        public static final int rotoroff=0x7f020008;
+        public static final int rotoron=0x7f020009;
+        public static final int stator=0x7f02000a;
+        public static final int statorswitch=0x7f02000b;
     }
     public static final class id {
-        public static final int SeekBar=0x7f070028;
-        public static final int TextView=0x7f070029;
-        public static final int ToggleButton=0x7f07002a;
-        public static final int auto_scan=0x7f070005;
-        public static final int button1=0x7f070000;
-        public static final int button2=0x7f070001;
-        public static final int button3=0x7f070002;
-        public static final int button4=0x7f070003;
-        public static final int buttonScrollView=0x7f070016;
-        public static final int channel_1=0x7f07000a;
-        public static final int channel_2=0x7f07000b;
-        public static final int channel_3=0x7f07000c;
-        public static final int channel_4=0x7f07000d;
-        public static final int channel_5=0x7f07000e;
-        public static final int channel_6=0x7f07000f;
-        public static final int display_freq=0x7f070009;
-        public static final int graph0=0x7f070013;
-        public static final int imageView1=0x7f07002b;
-        public static final int power=0x7f070004;
-        public static final int scrollView1=0x7f070015;
-        public static final int sw_knob0=0x7f070014;
-        public static final int textView1=0x7f070007;
-        public static final int textView2=0x7f070011;
-        public static final int toggleButtonD0=0x7f070017;
-        public static final int toggleButtonD1=0x7f070018;
-        public static final int toggleButtonD10=0x7f070021;
-        public static final int toggleButtonD11=0x7f070022;
-        public static final int toggleButtonD12=0x7f070023;
-        public static final int toggleButtonD13=0x7f070024;
-        public static final int toggleButtonD14=0x7f070025;
-        public static final int toggleButtonD15=0x7f070026;
-        public static final int toggleButtonD2=0x7f070019;
-        public static final int toggleButtonD3=0x7f07001a;
-        public static final int toggleButtonD4=0x7f07001b;
-        public static final int toggleButtonD5=0x7f07001c;
-        public static final int toggleButtonD6=0x7f07001d;
-        public static final int toggleButtonD7=0x7f07001e;
-        public static final int toggleButtonD8=0x7f07001f;
-        public static final int toggleButtonD9=0x7f070020;
-        public static final int toggleButtonLed=0x7f070027;
-        public static final int tune_down=0x7f070006;
-        public static final int tune_up=0x7f070008;
-        public static final int volume_down_button=0x7f070010;
-        public static final int volume_up_button=0x7f070012;
+        public static final int SeekBar=0x7f070026;
+        public static final int TextView=0x7f070027;
+        public static final int ToggleButton=0x7f070028;
+        public static final int auto_scan=0x7f070003;
+        public static final int buttonScrollView=0x7f070014;
+        public static final int channel_1=0x7f070008;
+        public static final int channel_2=0x7f070009;
+        public static final int channel_3=0x7f07000a;
+        public static final int channel_4=0x7f07000b;
+        public static final int channel_5=0x7f07000c;
+        public static final int channel_6=0x7f07000d;
+        public static final int display_freq=0x7f070007;
+        public static final int graph0=0x7f070011;
+        public static final int imageView1=0x7f070029;
+        public static final int lED1=0x7f070001;
+        public static final int listView1=0x7f070000;
+        public static final int power=0x7f070002;
+        public static final int scrollView1=0x7f070013;
+        public static final int sw_knob0=0x7f070012;
+        public static final int textView1=0x7f070005;
+        public static final int textView2=0x7f07000f;
+        public static final int toggleButtonD0=0x7f070015;
+        public static final int toggleButtonD1=0x7f070016;
+        public static final int toggleButtonD10=0x7f07001f;
+        public static final int toggleButtonD11=0x7f070020;
+        public static final int toggleButtonD12=0x7f070021;
+        public static final int toggleButtonD13=0x7f070022;
+        public static final int toggleButtonD14=0x7f070023;
+        public static final int toggleButtonD15=0x7f070024;
+        public static final int toggleButtonD2=0x7f070017;
+        public static final int toggleButtonD3=0x7f070018;
+        public static final int toggleButtonD4=0x7f070019;
+        public static final int toggleButtonD5=0x7f07001a;
+        public static final int toggleButtonD6=0x7f07001b;
+        public static final int toggleButtonD7=0x7f07001c;
+        public static final int toggleButtonD8=0x7f07001d;
+        public static final int toggleButtonD9=0x7f07001e;
+        public static final int toggleButtonLed=0x7f070025;
+        public static final int tune_down=0x7f070004;
+        public static final int tune_up=0x7f070006;
+        public static final int volume_down_button=0x7f07000e;
+        public static final int volume_up_button=0x7f070010;
     }
     public static final class layout {
         public static final int board=0x7f030000;
-        public static final int fm_activity=0x7f030001;
-        public static final int graph_activity=0x7f030002;
-        public static final int main=0x7f030003;
-        public static final int simple=0x7f030004;
+        public static final int custom_controls=0x7f030001;
+        public static final int fm_activity=0x7f030002;
+        public static final int graph_activity=0x7f030003;
+        public static final int main=0x7f030004;
+        public static final int simple=0x7f030005;
     }
     public static final class string {
         public static final int analog_label=0x7f050003;
@@ -189,6 +206,57 @@ containing a value of this type.
         public static final int device_filter=0x7f040001;
     }
     public static final class styleable {
+        /** Attributes that can be used with a LED.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #LED_ison com.bmt.ioio_demo:ison}</code></td><td></td></tr>
+           <tr><td><code>{@link #LED_ledoff_image com.bmt.ioio_demo:ledoff_image}</code></td><td></td></tr>
+           <tr><td><code>{@link #LED_ledon_image com.bmt.ioio_demo:ledon_image}</code></td><td></td></tr>
+           </table>
+           @see #LED_ison
+           @see #LED_ledoff_image
+           @see #LED_ledon_image
+         */
+        public static final int[] LED = {
+            0x7f01000b, 0x7f01000c, 0x7f01000d
+        };
+        /**
+          <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#ison}
+          attribute's value can be found in the {@link #LED} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name com.bmt.ioio_demo:ison
+        */
+        public static final int LED_ison = 0;
+        /**
+          <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#ledoff_image}
+          attribute's value can be found in the {@link #LED} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name com.bmt.ioio_demo:ledoff_image
+        */
+        public static final int LED_ledoff_image = 2;
+        /**
+          <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#ledon_image}
+          attribute's value can be found in the {@link #LED} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name com.bmt.ioio_demo:ledon_image
+        */
+        public static final int LED_ledon_image = 1;
         /** Attributes that can be used with a UIGraphView.
            <p>Includes the following attributes:</p>
            <table>

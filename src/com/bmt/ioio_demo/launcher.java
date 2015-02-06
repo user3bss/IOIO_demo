@@ -4,52 +4,53 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import com.bmt.customviews.TestCustomControlsActivity;
 
 
-public class launcher extends Activity implements OnClickListener {
-	TextView button0 = null;
-	TextView button1 = null;
-	TextView button2 = null;
-	TextView button3 = null;
+public class launcher extends Activity{
 	Context content = null;
+	String tag = getClass().getSimpleName();
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.board);
 		content = this;
-		button0 = (TextView) findViewById(R.id.button1);
-		button1 = (TextView) findViewById(R.id.button2);
-		button2 = (TextView) findViewById(R.id.button3);
-		button3 = (TextView) findViewById(R.id.button4);
-		
-		button0.setOnClickListener(this);
-		button1.setOnClickListener(this);
-		button2.setOnClickListener(this);
-		button3.setOnClickListener(this);
+		ListView apps = (ListView) findViewById(R.id.listView1);
+		apps.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		final String[] values = {"FM Paralxx 27984","Volt Graph","Simple App","Switches", "Test Cutom Controls"};
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+		          android.R.layout.simple_list_item_1, android.R.id.text1, values );
+		apps.setAdapter(adapter);
+		apps.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, final View v, int position, long id) {
+				Log.i(tag, "onTouchListener: "+values[position]);	
+				Intent intent = null;
+				switch(position){
+					case 0:
+						intent = new Intent(content, FM_Activity.class);
+						break;
+					case 1:
+						intent = new Intent(content, GraphActivity.class);				
+						break;
+					case 2:
+						intent = new Intent(content, IOIOSimpleApp.class);				
+						break;
+					case 3:
+						intent = new Intent(content, MainActivity.class);				
+						break;
+					case 4:
+						intent = new Intent(content, TestCustomControlsActivity.class);
+				}
+				startActivity(intent);
+			}
+	   });
 	}
-	
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		Intent intent = null;
-		switch(v.getId()){
-			case R.id.button1:
-				intent = new Intent(content, FM_Activity.class);
-				//intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				break;
-			case R.id.button2:
-				intent = new Intent(content, GraphActivity.class);				
-				break;
-			case R.id.button3:
-				intent = new Intent(content, MainActivity.class);				
-				break;
-			case R.id.button4:
-				intent = new Intent(content, IOIOSimpleApp.class);				
-				break;
-		}
-		startActivity(intent);		
-	}	
 }

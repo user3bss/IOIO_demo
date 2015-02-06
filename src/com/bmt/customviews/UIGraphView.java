@@ -21,7 +21,7 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.bmt.GraphView.line_chart;
+import com.bmt.custom_classes.line_chart;
 import com.bmt.ioio_demo.R;
 
 
