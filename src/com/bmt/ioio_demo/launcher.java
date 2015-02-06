@@ -24,7 +24,7 @@ public class launcher extends Activity{
 		content = this;
 		ListView apps = (ListView) findViewById(R.id.listView1);
 		apps.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-		final String[] values = {"FM Paralxx 27984","Volt Graph","Simple App","Switches", "Test Cutom Controls"};
+		final String[] values = {"FM Paralxx 27984","Volt Graph","Simple App","Switches", "Test Custom Controls"};
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
 		          android.R.layout.simple_list_item_1, android.R.id.text1, values );
 		apps.setAdapter(adapter);

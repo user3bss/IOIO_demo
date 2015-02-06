@@ -59,23 +59,23 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int ison=0x7f01000b;
+        public static final int ison=0x7f010005;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int ledoff_image=0x7f01000d;
+        public static final int ledoff_image=0x7f010007;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int ledon_image=0x7f01000c;
+        public static final int ledon_image=0x7f010006;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int off_image=0x7f01000a;
+        public static final int off_image=0x7f01000d;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int on_image=0x7f010009;
+        public static final int on_image=0x7f01000c;
         /** <p>Must be an integer value, such as "<code>100</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -83,15 +83,15 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int position=0x7f010005;
+        public static final int position=0x7f010008;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int rotor_image=0x7f010007;
+        public static final int rotor_image=0x7f01000a;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int stator_image=0x7f010006;
+        public static final int stator_image=0x7f010009;
         /** <p>Must be an integer value, such as "<code>100</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -99,7 +99,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int value=0x7f010008;
+        public static final int value=0x7f01000b;
     }
     public static final class drawable {
         public static final int dots=0x7f020000;
@@ -116,48 +116,50 @@ containing a value of this type.
         public static final int statorswitch=0x7f02000b;
     }
     public static final class id {
-        public static final int SeekBar=0x7f070026;
-        public static final int TextView=0x7f070027;
-        public static final int ToggleButton=0x7f070028;
-        public static final int auto_scan=0x7f070003;
-        public static final int buttonScrollView=0x7f070014;
-        public static final int channel_1=0x7f070008;
-        public static final int channel_2=0x7f070009;
-        public static final int channel_3=0x7f07000a;
-        public static final int channel_4=0x7f07000b;
-        public static final int channel_5=0x7f07000c;
-        public static final int channel_6=0x7f07000d;
-        public static final int display_freq=0x7f070007;
-        public static final int graph0=0x7f070011;
-        public static final int imageView1=0x7f070029;
-        public static final int lED1=0x7f070001;
+        public static final int SeekBar=0x7f070028;
+        public static final int TextView=0x7f070029;
+        public static final int ToggleButton=0x7f07002a;
+        public static final int auto_scan=0x7f070005;
+        public static final int buttonScrollView=0x7f070016;
+        public static final int channel_1=0x7f07000a;
+        public static final int channel_2=0x7f07000b;
+        public static final int channel_3=0x7f07000c;
+        public static final int channel_4=0x7f07000d;
+        public static final int channel_5=0x7f07000e;
+        public static final int channel_6=0x7f07000f;
+        public static final int display_freq=0x7f070009;
+        public static final int graph0=0x7f070013;
+        public static final int imageView1=0x7f07002b;
+        public static final int lED1=0x7f070003;
+        public static final int lED2=0x7f070002;
+        public static final int lED3=0x7f070001;
         public static final int listView1=0x7f070000;
-        public static final int power=0x7f070002;
-        public static final int scrollView1=0x7f070013;
-        public static final int sw_knob0=0x7f070012;
-        public static final int textView1=0x7f070005;
-        public static final int textView2=0x7f07000f;
-        public static final int toggleButtonD0=0x7f070015;
-        public static final int toggleButtonD1=0x7f070016;
-        public static final int toggleButtonD10=0x7f07001f;
-        public static final int toggleButtonD11=0x7f070020;
-        public static final int toggleButtonD12=0x7f070021;
-        public static final int toggleButtonD13=0x7f070022;
-        public static final int toggleButtonD14=0x7f070023;
-        public static final int toggleButtonD15=0x7f070024;
-        public static final int toggleButtonD2=0x7f070017;
-        public static final int toggleButtonD3=0x7f070018;
-        public static final int toggleButtonD4=0x7f070019;
-        public static final int toggleButtonD5=0x7f07001a;
-        public static final int toggleButtonD6=0x7f07001b;
-        public static final int toggleButtonD7=0x7f07001c;
-        public static final int toggleButtonD8=0x7f07001d;
-        public static final int toggleButtonD9=0x7f07001e;
-        public static final int toggleButtonLed=0x7f070025;
-        public static final int tune_down=0x7f070004;
-        public static final int tune_up=0x7f070006;
-        public static final int volume_down_button=0x7f07000e;
-        public static final int volume_up_button=0x7f070010;
+        public static final int power=0x7f070004;
+        public static final int scrollView1=0x7f070015;
+        public static final int sw_knob0=0x7f070014;
+        public static final int textView1=0x7f070007;
+        public static final int textView2=0x7f070011;
+        public static final int toggleButtonD0=0x7f070017;
+        public static final int toggleButtonD1=0x7f070018;
+        public static final int toggleButtonD10=0x7f070021;
+        public static final int toggleButtonD11=0x7f070022;
+        public static final int toggleButtonD12=0x7f070023;
+        public static final int toggleButtonD13=0x7f070024;
+        public static final int toggleButtonD14=0x7f070025;
+        public static final int toggleButtonD15=0x7f070026;
+        public static final int toggleButtonD2=0x7f070019;
+        public static final int toggleButtonD3=0x7f07001a;
+        public static final int toggleButtonD4=0x7f07001b;
+        public static final int toggleButtonD5=0x7f07001c;
+        public static final int toggleButtonD6=0x7f07001d;
+        public static final int toggleButtonD7=0x7f07001e;
+        public static final int toggleButtonD8=0x7f07001f;
+        public static final int toggleButtonD9=0x7f070020;
+        public static final int toggleButtonLed=0x7f070027;
+        public static final int tune_down=0x7f070006;
+        public static final int tune_up=0x7f070008;
+        public static final int volume_down_button=0x7f070010;
+        public static final int volume_up_button=0x7f070012;
     }
     public static final class layout {
         public static final int board=0x7f030000;
@@ -221,7 +223,7 @@ containing a value of this type.
            @see #LED_ledon_image
          */
         public static final int[] LED = {
-            0x7f01000b, 0x7f01000c, 0x7f01000d
+            0x7f010005, 0x7f010006, 0x7f010007
         };
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#ison}
@@ -367,7 +369,7 @@ containing a value of this type.
            @see #UIKnob_value
          */
         public static final int[] UIKnob = {
-            0x7f010008, 0x7f010009, 0x7f01000a
+            0x7f01000b, 0x7f01000c, 0x7f01000d
         };
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#off_image}
@@ -418,7 +420,7 @@ containing a value of this type.
            @see #UIKnobSwitch_stator_image
          */
         public static final int[] UIKnobSwitch = {
-            0x7f010005, 0x7f010006, 0x7f010007
+            0x7f010008, 0x7f010009, 0x7f01000a
         };
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#position}

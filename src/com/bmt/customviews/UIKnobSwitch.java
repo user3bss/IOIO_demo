@@ -31,11 +31,14 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 	private Bitmap stator = null;
 	int default_stator_image = R.drawable.statorswitch;
 	int default_rotor_image = R.drawable.rotoron;	
-	private Path tiPath = null;	
+	//private Path tiPath = null;	
 	private boolean enabled = true;
 	private int position = 0;
 	String tag = getClass().getSimpleName();	
 	Context c = null;
+	Matrix scale_matrix = null;	
+	Matrix matrix = null;
+	DisplayMetrics metrics = null;
 	
 	public interface UIKnobSwitchListener {
 		public void onChange(int position);
@@ -43,6 +46,80 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 	private UIKnobSwitchListener m_listener = null;
 	public void SetListener(UIKnobSwitchListener uiKnobListener) {
 		m_listener = uiKnobListener;
+	}
+	
+	public  UIKnobSwitch(Context context) {
+		super(context);
+		c = context;
+		setPaintOptions();
+		set_stator_image(default_stator_image);
+		set_rotor_image(default_rotor_image);
+		set_position(0);		
+		if(!isInEditMode())
+			gestureDetector = new GestureDetector(getContext(), this);
+	}
+	public  UIKnobSwitch(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		c = context;
+		setPaintOptions();
+		setPaintOptions(attrs);
+		if(!isInEditMode())
+			gestureDetector = new GestureDetector(getContext(), this);
+	}
+
+	public  UIKnobSwitch(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		c = context;
+		setPaintOptions();
+		setPaintOptions(attrs);
+		if(!isInEditMode())
+			gestureDetector = new GestureDetector(getContext(), this);
+	}	  
+
+	@Override
+	public Parcelable onSaveInstanceState() {
+	    Bundle bundle = new Bundle();
+	    bundle.putParcelable("instanceState", super.onSaveInstanceState());
+	    bundle.putFloat("mAngle", mAngle);
+	    // ... save everything
+	    return bundle;
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Parcelable state) {
+		if (state instanceof Bundle) {
+			Bundle bundle = (Bundle) state;
+			this.mAngle = bundle.getFloat("mAngle");
+			// ... load everything
+			state = bundle.getParcelable("instanceState");
+		}
+		super.onRestoreInstanceState(state);
+	}	
+	private void setPaintOptions() {
+		tiBitmapPaint = new Paint();
+		tiBitmapPaint.setAntiAlias(true);
+		tiBitmapPaint.setDither(true);
+		tiBitmapPaint.setColor(Color.BLACK);
+		tiBitmapPaint.setStyle(Paint.Style.STROKE);
+		tiBitmapPaint.setStrokeJoin(Paint.Join.ROUND);
+		tiBitmapPaint.setStrokeCap(Paint.Cap.ROUND);
+		tiBitmapPaint.setStrokeWidth(2);
+		tiBitmapPaint.setAlpha(128);
+		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);			
+	}
+	private void setPaintOptions(AttributeSet attrs) {		
+		Log.i(tag, "using attrs");		   		   
+		TypedArray a = c.getTheme().obtainStyledAttributes(attrs, R.styleable.UIKnobSwitch, 0, 0);
+		   try {
+			   	int _position = a.getInt(R.styleable.UIKnobSwitch_position, 2);
+			   	set_position(_position);
+				set_stator_image(a.getResourceId(R.styleable.UIKnobSwitch_stator_image, default_stator_image));
+				set_rotor_image(a.getResourceId(R.styleable.UIKnobSwitch_rotor_image, default_rotor_image));
+				invalidate();
+		   } finally {
+		       a.recycle();
+		   }
+		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);		  
 	}
 	public void set_stator_image(int r){
 		stator = BitmapFactory.decodeResource(c.getResources(), r);		
@@ -109,106 +186,38 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 			invalidate();
 		}
 	}	
-	private void setPaintOptions(Context context) {
-		tiBitmapPaint = new Paint();
-		tiBitmapPaint.setAntiAlias(true);
-		tiBitmapPaint.setDither(true);
-		tiBitmapPaint.setColor(Color.BLACK);
-		tiBitmapPaint.setStyle(Paint.Style.STROKE);
-		tiBitmapPaint.setStrokeJoin(Paint.Join.ROUND);
-		tiBitmapPaint.setStrokeCap(Paint.Cap.ROUND);
-		tiBitmapPaint.setStrokeWidth(2);
-		tiBitmapPaint.setAlpha(128);
-		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);	
-		c = context;		
-	}
-	private void setPaintOptions(Context context, AttributeSet attrs) {		
-		Log.i(tag, "using attrs");
-		   setPaintOptions(context);		   
-			TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.UIKnobSwitch, 0, 0);
-			   try {
-				   	int _position = a.getInt(R.styleable.UIKnobSwitch_position, 2);
-				   	set_position(_position);
-					set_stator_image(a.getResourceId(R.styleable.UIKnobSwitch_stator_image, R.drawable.statorswitch));
-					set_rotor_image(a.getResourceId(R.styleable.UIKnobSwitch_rotor_image, R.drawable.rotoroff));
-					invalidate();
-			   } finally {
-			       a.recycle();
-			   }
-		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);		  
-	}
 	
 	public void setEnabled(boolean b){
 		enabled = b;
-	}	
-	public  UIKnobSwitch(Context context) {
-		super(context);
-		setPaintOptions(context);
-		set_stator_image(default_stator_image);
-		set_rotor_image(default_rotor_image);
-		set_position(0);		
-		if(!isInEditMode())
-			gestureDetector = new GestureDetector(getContext(), this);
-	}
-	public  UIKnobSwitch(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		setPaintOptions(context, attrs);
-		if(!isInEditMode())
-			gestureDetector = new GestureDetector(getContext(), this);
-	}
-
-	public  UIKnobSwitch(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		setPaintOptions(context, attrs);
-		if(!isInEditMode())
-			gestureDetector = new GestureDetector(getContext(), this);
-	}	  
-
-	@Override
-	public Parcelable onSaveInstanceState() {
-	    Bundle bundle = new Bundle();
-	    bundle.putParcelable("instanceState", super.onSaveInstanceState());
-	    bundle.putFloat("mAngle", mAngle);
-	    // ... save everything
-	    return bundle;
-	}
-	
-	@Override
-	public void onRestoreInstanceState(Parcelable state) {
-		if (state instanceof Bundle) {
-			Bundle bundle = (Bundle) state;
-			this.mAngle = bundle.getFloat("mAngle");
-			// ... load everything
-			state = bundle.getParcelable("instanceState");
-		}
-		super.onRestoreInstanceState(state);
 	}
 	
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
+		//if(w==0 || h == 0) return;
 		background = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
 		ctx = new Canvas(background);
+	    metrics = getResources().getDisplayMetrics();
+		scale_matrix = new Matrix();	
+		float scale = (this.getWidth()/metrics.scaledDensity) / 250.0f;	//graphic size is 250
+		scale_matrix.setScale(scale, scale);
+		matrix = new Matrix();
+		matrix.postScale(scale, scale);			
 		invalidate();
 	}	
 
 	@Override
-	protected void onDraw(Canvas canvas) {
-	    DisplayMetrics metrics = getResources().getDisplayMetrics();
+	protected void onDraw(Canvas canvas) {    
 		canvas.drawBitmap(background, 0, 0, tiBitmapPaint);
-		Matrix scale_matrix = new Matrix();		
-		float scale = (this.getWidth()/metrics.scaledDensity) / 250.0f;	//graphic size is 250
-		scale_matrix.setScale(scale, scale);
-		canvas.drawBitmap(stator, scale_matrix, tiBitmapPaint);	
-		
-		Matrix matrix = new Matrix();
-		matrix.postScale(scale, scale);
+		if(stator != null)
+			canvas.drawBitmap(stator, scale_matrix, tiBitmapPaint);	
 		matrix.postRotate(mAngle, (this.getWidth()/metrics.scaledDensity)/2, (this.getWidth()/metrics.scaledDensity)/2);				
-		canvas.drawBitmap(rotor, matrix, tiBitmapPaint);				
+		if(rotor != null)
+			canvas.drawBitmap(rotor, matrix, tiBitmapPaint);		
 		
-		if (tiPath != null) {
+		/*if (tiPath != null) {
 			canvas.drawPath(tiPath, tiBitmapPaint);
-		}		
+		}*/		
 	}
 	
 	@Override 
@@ -263,7 +272,6 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 	@Override
 	public void onLongPress(MotionEvent arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

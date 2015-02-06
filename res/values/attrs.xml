@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
    <declare-styleable name="UIGraphView">
-       <attr name="BorderColor" format="color" />
+       <attr name = "BorderColor" format="color" />
        <attr name = "BorderStrokeWidth" format="integer" />
        <attr name = "LineColor" format = "color" />
        <attr name = "LineStrokeWidth" format = "integer" />
        <attr name = "FontColor" format = "color" />           
    </declare-styleable>
-
+   <declare-styleable name="LED"> 
+       <attr name="ison" format="boolean" />
+       <attr name="ledon_image" format="reference"/>
+       <attr name="ledoff_image" format="reference" />              
+   </declare-styleable>
    <declare-styleable name="UIKnobSwitch"> 
        <attr name="position" format="integer" /> 
        <attr name="stator_image" format="reference"/>
@@ -18,10 +22,5 @@
        <attr name="value" format="integer" />
        <attr name="on_image" format="reference"/>
        <attr name="off_image" format="reference" />              
-   </declare-styleable>
-   <declare-styleable name="LED"> 
-       <attr name="ison" format="boolean" />
-       <attr name="ledon_image" format="reference"/>
-       <attr name="ledoff_image" format="reference" />              
    </declare-styleable>   
 </resources>

@@ -33,40 +33,79 @@ public class UIKnob extends View implements OnGestureListener {
 	private Path tiPath = null;	
 	private int stateToSave;
 	private boolean enabled = true;
+	String tag = getClass().getSimpleName();	
+	Context c = null;
+	Matrix scale_matrix = null;
+	Matrix matrix = null;
+	DisplayMetrics metrics = null;
 	
 	public interface UIKnobListener {
 		public void onStateChange(boolean newstate) ;
 		public void onRotate(int percentage);
 	}
-	
-	String tag = getClass().getSimpleName();	
-	Context c = null;
-	public void setEnabled(boolean s){
-		enabled = s;
-	}
-	
 	private UIKnobListener m_listener = null;
 	public void SetListener(UIKnobListener uiKnobListener) {
-		// TODO Auto-generated method stub
 		m_listener = uiKnobListener;
 	}	
 	
-	public  UIKnob(Context context) {
+	public void setEnabled(boolean s){
+		enabled = s;
+	}	
+	public void SetState(boolean state) {
+		mState = state;
+		invalidate();
+		//ivRotor.setImageBitmap(state?bmpRotorOn:bmpRotorOff);
+	}
+	private void setPaintOptions() {
+		tiBitmapPaint = new Paint();
+		tiBitmapPaint.setAntiAlias(true);
+		tiBitmapPaint.setDither(true);
+		tiBitmapPaint.setColor(Color.BLACK);
+		tiBitmapPaint.setStyle(Paint.Style.STROKE);
+		tiBitmapPaint.setStrokeJoin(Paint.Join.ROUND);
+		tiBitmapPaint.setStrokeCap(Paint.Cap.ROUND);
+		tiBitmapPaint.setStrokeWidth(2);
+		tiBitmapPaint.setAlpha(128);
+		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);	
+		stator = BitmapFactory.decodeResource(c.getResources(), R.drawable.stator);
+		rotorOff = BitmapFactory.decodeResource(c.getResources(), R.drawable.rotoroff);
+		rotorOn = BitmapFactory.decodeResource(c.getResources(), R.drawable.rotoron);						
+	}
+	private void setPaintOptions(AttributeSet attrs) {		
+		Log.i(tag, "using attrs");		
+		TypedArray a = c.getTheme().obtainStyledAttributes(attrs, R.styleable.UIKnob, 0, 0);
+		   try {			   	
+				int r = a.getResourceId(R.styleable.UIKnob_on_image, R.drawable.rotoron);
+				rotorOn = BitmapFactory.decodeResource(c.getResources(), r);
+				r = a.getResourceId(R.styleable.UIKnob_off_image, R.drawable.rotoroff);
+				rotorOff = BitmapFactory.decodeResource(c.getResources(), r);
+				setRotorPercentage(a.getInt(R.styleable.UIKnob_value, 0));				
+				invalidate();
+		   } finally {
+		       a.recycle();
+		   }		  
+	}	
+	public UIKnob(Context context) {
 		super(context);
-		setPaintOptions(context);
+		c = context;
+		setPaintOptions();
 		if(!isInEditMode())
 			gestureDetector = new GestureDetector(getContext(), this);
 	}
-	public  UIKnob(Context context, AttributeSet attrs) {
+	public UIKnob(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		setPaintOptions(context, attrs);
+		c = context;
+		setPaintOptions();
+		setPaintOptions(attrs);
 		if(!isInEditMode())
 			gestureDetector = new GestureDetector(getContext(), this);
 	}
 
 	public  UIKnob(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		setPaintOptions(context, attrs);
+		c = context;
+		setPaintOptions();
+		setPaintOptions(attrs);
 		if(!isInEditMode())
 			gestureDetector = new GestureDetector(getContext(), this);
 	}	  
@@ -103,73 +142,32 @@ public class UIKnob extends View implements OnGestureListener {
 		super.onSizeChanged(w, h, oldw, oldh);
 		background = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
 		ctx = new Canvas(background);
+		metrics = getResources().getDisplayMetrics();		
+		float scale = (this.getWidth()/metrics.scaledDensity) / 250.0f;	//graphic size is 250	
+		scale_matrix = new Matrix();
+		scale_matrix.setScale(scale, scale);
+		//scale_matrix.setTranslate(0, 0);
+		matrix = new Matrix();
+		matrix.postScale(scale, scale);		
 		invalidate();
 	}	
 
 	@Override
-	protected void onDraw(Canvas canvas) {
-	    DisplayMetrics metrics = getResources().getDisplayMetrics();
+	protected void onDraw(Canvas canvas) {	    
 		canvas.drawBitmap(background, 0, 0, tiBitmapPaint);
-		//canvas.drawBitmap(stator, 0, 0, tiBitmapPaint);
-		Matrix scale_matrix = new Matrix();		
-		float scale = (this.getWidth()/metrics.scaledDensity) / 250.0f;	//graphic size is 250	
-		//scale_matrix.setTranslate(0, 0);
-		scale_matrix.setScale(scale, scale);
-		canvas.drawBitmap(stator, scale_matrix, tiBitmapPaint);	
+		if(stator != null)
+			canvas.drawBitmap(stator, scale_matrix, tiBitmapPaint);		
 		
-		Matrix matrix = new Matrix();
-		matrix.postScale(scale, scale);
-		matrix.postRotate(mAngle, this.getWidth()/2, this.getWidth()/2);		
-		if(mState)		
+		matrix.postRotate(mAngle, (this.getWidth()/metrics.scaledDensity)/2, (this.getWidth()/metrics.scaledDensity)/2);		
+		if(mState && rotorOn != null)		
 			canvas.drawBitmap(rotorOn, matrix, tiBitmapPaint);
-		else
-			canvas.drawBitmap(rotorOff, matrix, tiBitmapPaint);		
-		
-		
-		if (tiPath != null) {
+		else if(rotorOff != null)
+			canvas.drawBitmap(rotorOff, matrix, tiBitmapPaint);
+		/*if (tiPath != null) {
 			//Log.i(tag, "tiPath != null ");
 			canvas.drawPath(tiPath, tiBitmapPaint);
-		}		
-	}	
-	public void SetState(boolean state) {
-		mState = state;
-		invalidate();
-		//ivRotor.setImageBitmap(state?bmpRotorOn:bmpRotorOff);
-	}
-	private void setBitmaps(){
-		stator = BitmapFactory.decodeResource(c.getResources(), R.drawable.stator);
-		rotorOff = BitmapFactory.decodeResource(c.getResources(), R.drawable.rotoroff);
-		rotorOn = BitmapFactory.decodeResource(c.getResources(), R.drawable.rotoron);
-	}
-	private void setPaintOptions(Context context) {
-		tiBitmapPaint = new Paint();
-		tiBitmapPaint.setAntiAlias(true);
-		tiBitmapPaint.setDither(true);
-		tiBitmapPaint.setColor(Color.BLACK);
-		tiBitmapPaint.setStyle(Paint.Style.STROKE);
-		tiBitmapPaint.setStrokeJoin(Paint.Join.ROUND);
-		tiBitmapPaint.setStrokeCap(Paint.Cap.ROUND);
-		tiBitmapPaint.setStrokeWidth(2);
-		tiBitmapPaint.setAlpha(128);
-		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);	
-		c = context;
-		setBitmaps();						
-	}
-	private void setPaintOptions(Context context, AttributeSet attrs) {		
-		Log.i(tag, "using attrs");
-		setPaintOptions(context);		
-		TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.UIKnob, 0, 0);
-		   try {			   	
-				int r = a.getResourceId(R.styleable.UIKnob_on_image, R.drawable.rotoron);
-				rotorOn = BitmapFactory.decodeResource(context.getResources(), r);
-				r = a.getResourceId(R.styleable.UIKnob_off_image, R.drawable.rotoroff);
-				rotorOff = BitmapFactory.decodeResource(context.getResources(), r);
-				setRotorPercentage(a.getInt(R.styleable.UIKnob_value, 0));				
-				invalidate();
-		   } finally {
-		       a.recycle();
-		   }		  
-	}	
+		}*/
+	}		
 
 	/**
 	 * math..
@@ -278,5 +276,4 @@ public class UIKnob extends View implements OnGestureListener {
 		// TODO Auto-generated method stub
 		
 	}
-
 }
