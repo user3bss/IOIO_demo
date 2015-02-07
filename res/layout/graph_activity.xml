@@ -3,12 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res/com.bmt.ioio_demo"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     android:orientation="horizontal" >
 
     <com.bmt.customviews.UIGraphView
         android:id="@+id/graph0"
-        android:layout_width="282dp"
-        android:layout_height="233dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_margin="10dp"
         android:layout_weight="0.27"
         app:BorderColor="#FFFFFF"
@@ -16,12 +17,5 @@
         app:FontColor="#FFFFFF"
         app:LineColor="#DADADA"
         app:LineStrokeWidth="1" />
-
-    <com.bmt.customviews.UIKnobSwitch
-        android:id="@+id/sw_knob0"
-        android:layout_width="141dp"
-        android:layout_height="134dp"
-        android:layout_margin="10dp"
-        app:position="0" />
 
 </LinearLayout>

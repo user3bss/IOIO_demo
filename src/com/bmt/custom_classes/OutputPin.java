@@ -5,34 +5,35 @@ import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;
 
 public class OutputPin {
-	public DigitalOutput ioiopindo; //all except for 9
-	private int pin_num;
+	String tag = getClass().getSimpleName();
+	public DigitalOutput ioiopindo = null; //all except for 9
+	private int pin_num = -1;
 	boolean bit = false;
-	IOIO ioio_ = null;
-	
-	public OutputPin(IOIO ioio, int PinNum){
-		ioio_ = ioio;
-		pin_num = PinNum;
+
+	public int getPinNum(){
+		return pin_num;
+	}
+	public OutputPin(IOIO ioio, int PinNum){		
 		try {					
 			if(PinNum != 9){ //9 is input only
-				ioiopindo = ioio_.openDigitalOutput(PinNum);
+				pin_num = PinNum;
+				ioiopindo = ioio.openDigitalOutput(PinNum);
 			}
 		} catch (ConnectionLostException e) {
-			
+			ioiopindo = null;
 		}		
 	}
 	public OutputPin(IOIO ioio, int PinNum, int _type, boolean state){
-		ioio_ = ioio;
-		pin_num = PinNum;
 		try {					
-			if(PinNum != 9){ //9 is input only					
+			if(PinNum != 9){ //9 is input only
+				pin_num = PinNum;
+				if(_type < 3)
+					ioiopindo = ioio.openDigitalOutput(PinNum, state);					
 				if(_type == 3)
-					ioiopindo = ioio_.openDigitalOutput(PinNum, state);					
-				if(_type != 3)
-					ioiopindo = ioio_.openDigitalOutput(PinNum, DigitalOutput.Spec.Mode.OPEN_DRAIN, state);
+					ioiopindo = ioio.openDigitalOutput(PinNum, DigitalOutput.Spec.Mode.OPEN_DRAIN, state);
 			}
 		} catch (ConnectionLostException e) {
-			
+			ioiopindo = null;
 		}		
 	}
 	public boolean readBit(){
@@ -41,9 +42,10 @@ public class OutputPin {
 	public void writeBit(boolean _bit){
 		try {
 			bit = _bit;
-			ioiopindo.write(bit);
+			if(ioiopindo != null)
+				ioiopindo.write(bit);
 		} catch (ConnectionLostException e) {
-			
+			ioiopindo = null;
 		}
 	}
 }

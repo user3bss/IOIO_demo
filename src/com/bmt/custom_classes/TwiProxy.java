@@ -1,4 +1,4 @@
-package com.bmt.custom_classes;
+package 	com.bmt.custom_classes;
 
 import ioio.lib.api.IOIO;
 import ioio.lib.api.TwiMaster;
@@ -13,20 +13,17 @@ public class TwiProxy {
 	private byte[] twiResult;
 	TwiMaster.Result result;
 	boolean TenBitAddr = false;	
-	IOIO ioio_ = null;
 	
 	TwiProxy(int twi_num, IOIO ioio){
-		ioio_ = ioio;
-		try {
-			twiNum = twi_num;
-			openTWI();
-		} catch (ConnectionLostException e) {
-			
-		}
+		twiNum = twi_num;
+		openTWI(ioio);
 	}
-	public void openTWI() throws ConnectionLostException{
-		Log.d(tag, "Opening TwiNum: [1]: " + twiNum + " and TwiRate: [100k] : "+twiRate);		
-		twi = ioio_.openTwiMaster(twiNum, twiRate, false); //pass true as third argument for SMBus levels			
+	public void openTWI(IOIO ioio){					
+		try {
+			twi = ioio.openTwiMaster(twiNum, twiRate, false);
+		} catch (ConnectionLostException e) {
+			twi = null;
+		} //pass true as third argument for SMBus levels
 	}
 	public void closeTWI(){
 		twi.close();
@@ -35,28 +32,25 @@ public class TwiProxy {
 	public void setTwiRate(TwiMaster.Rate r){
 		Log.d(tag, "Setting TwiRate: "+r);
 		twiRate = r;
-		closeTWI();
-		try {
-			openTWI();
-		} catch (ConnectionLostException e) {
-			
-		}
 	}
-	public byte[] twi_RW(int address, byte[] request, int responseLength, boolean async) throws InterruptedException, ConnectionLostException{
-		//twi = ioio_.openTwiMaster(twiNum, twiRate, false);
+	public byte[] twi_RW(int address, byte[] request, int responseLength, boolean async){
 		twiResult = new byte[responseLength];
 		if( address > 256 ) 
 			TenBitAddr = true;
 		else
 			TenBitAddr = false;
-		
-		if(async){
-			TwiMaster.Result result = twi.writeReadAsync(address , TenBitAddr, request, request.length, twiResult, twiResult.length);
-			result.waitReady();  // blocks until response is available
-		} else {
-			twi.writeRead(address, TenBitAddr, request, request.length, twiResult, twiResult.length); //smbus Level
-		}
-		//twi.close();
+		try{
+			if(async && twi != null){
+				TwiMaster.Result result = twi.writeReadAsync(address , TenBitAddr, request, request.length, twiResult, twiResult.length);
+				result.waitReady();
+			} else if(twi != null){
+				twi.writeRead(address, TenBitAddr, request, request.length, twiResult, twiResult.length); //smbus Level
+			}
+		} catch (ConnectionLostException e) {
+			twi = null;
+		} catch (InterruptedException e) {
+			twi = null;
+		}  // blocks until response is available
 		return twiResult;
 	}
 }

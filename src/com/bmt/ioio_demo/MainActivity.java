@@ -302,8 +302,8 @@ public class MainActivity extends IOIOActivity implements OnClickListener{
 	}	
 	private void showVersions(IOIO ioio, String title) {
 		if(show_toast_connection_info){
-			IOIO_info ii = new IOIO_info(ioio);
-			toast( title+"\n"+String.format(ii.getinfo()) );
+			IOIO_info ii = new IOIO_info();
+			toast( title+"\n"+String.format(ii.getinfo(ioio)) );
 		}
 	}
 

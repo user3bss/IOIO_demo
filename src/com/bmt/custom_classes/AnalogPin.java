@@ -1,57 +1,64 @@
 package com.bmt.custom_classes;
 
+import java.util.ArrayList;
+
 import ioio.lib.api.AnalogInput;
 import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;
-import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 public class AnalogPin {
 	String tag = getClass().getSimpleName();
-	public AnalogInput ioiopina;  //31-46
+	public AnalogInput ioiopina = null;  //31-46
 	private int pin_num;
 	private float RefVolts = (float) 3.3;
-	IOIO ioio_ = null;
+	public ArrayList<Float> samples = null;
 	
+	public int getPinNum(){
+		return pin_num;
+	}
+	public float[] getSamples(){
+		float[] f = new float[samples.size()];
+		for(int i=0;i<samples.size();i++){
+			f[i] = samples.get(i);
+		}
+		return f;
+	}
 	public AnalogPin(IOIO ioio, int PinNum) {
-		ioio_ = ioio;
 		pin_num = PinNum;
 		try {					
 			if(PinNum <= 46 && PinNum >= 31){	
-				ioiopina = ioio_.openAnalogInput(PinNum);
+				ioiopina = ioio.openAnalogInput(PinNum);
 				ioiopina.setBuffer(256);
 				//float sr = ioiopina.getSampleRate();			//in Hz units.		
-				//RefVolts = ioiopina.getReference();
-				//toast("Reference Voltage: " + RefVolts+", SampleRate: "+sr );				
+				RefVolts = ioiopina.getReference();
+				//Log.i(tag, "Reference Voltage: " + RefVolts+", SampleRate: "+sr );				
 			}
+			samples = new ArrayList<Float>();
 			
 		} catch (ConnectionLostException e) {
-			
+			ioiopina = null;
 		}		
 	}
 	public float readAnalogInBuffered() throws InterruptedException, ConnectionLostException{
 		float v = 0;
-		//float val = 0;			
-		//printAnalogDroppedSamples(aIn0);
-		//int numSampleToRead = ioiopina.available();
-		//for(int i=0;i<numSampleToRead;i++){	//reads all available samples
-			v = ioiopina.getVoltageBuffered();
-			//val = ioiopina.readBuffered();
-			//toast("Voltage: "+v+", Value: "+val);				
-		//}
+		if(ioiopina != null){			
+			printDroppedSamples();
+			int numSampleToRead = ioiopina.available();
+			for(int i=0;i<numSampleToRead;i++){	//reads all available samples
+				samples.add( ioiopina.getVoltageBuffered() );
+				//v = ioiopina.readBuffered();
+			}
+		}
 		return v;
 	}
 	public float readAnalogInUnBuffered() throws InterruptedException, ConnectionLostException{
 		float v = 0;
-		//float val = 0;			
-		//printDroppedSamples();
-		//int numSampleToRead = ioiopina.available();
-		//for(int i=0;i<numSampleToRead;i++){	//reads all available samples
-			v = ioiopina.getVoltage();
-			//val = ioiopina.read();
-			//toast("Voltage: "+v+", Value: "+val);
-		//}
+		if(ioiopina != null){			
+			printDroppedSamples();
+			samples.add( ioiopina.getVoltage() );
+			//v = ioiopina.read();
+		}
 		return v;			
 	}
 	public void setRefVolts(float volts){
@@ -60,9 +67,11 @@ public class AnalogPin {
 			Log.d(tag,"RefVolts set to higher than 3.3");
 	}
 	public void printDroppedSamples() throws ConnectionLostException{
-		int droppedSamples = ioiopina.getOverflowCount();
-		if(droppedSamples > 0){
-			Log.i(tag, "DroppedSamples: "+droppedSamples);
-		}			
+		if(ioiopina != null){
+			int droppedSamples = ioiopina.getOverflowCount();
+			if(droppedSamples > 0){
+				Log.i(tag, "DroppedSamples: "+droppedSamples);
+			}
+		}
 	}
 }

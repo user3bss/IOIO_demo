@@ -232,18 +232,22 @@ abstract boolean 	onScroll(MotionEvent e1, MotionEvent e2, float distanceX, floa
  */
 	@Override
 	public boolean onScroll(MotionEvent ondown, MotionEvent currentMove, float distanceX, float distanceY) {
-			float x = ondown.getX() / ((float) getWidth());
-			float y = ondown.getY() / ((float) getHeight());
-			float xScroll = currentMove.getX()  / ((float) getWidth());
-			float yScroll = currentMove.getY()  / ((float) getHeight());
-			//e2.getYPrecision()			
-			//float mm = e2.getTouchMajor() + e2.getTouchMinor();
-			
-			//TODO have to shift the data backwards and forwards invalidate then a refresh draw
-			//pulling data from ? with the ability to pull using start offset and end offset
-			//getting chunks the same size as the available graph area that is
-			//width-leftOffset
-			if (m_listener != null) m_listener.onScrollUpdate(x,y,xScroll, yScroll);
+		float x = ondown.getX() / ((float) getWidth());
+		float y = ondown.getY() / ((float) getHeight());
+		float xScroll = currentMove.getX()  / ((float) getWidth());
+		float yScroll = currentMove.getY()  / ((float) getHeight());
+		//e2.getYPrecision()			
+		//float mm = e2.getTouchMajor() + e2.getTouchMinor();
+		
+		//TODO have to shift the data backwards and forwards invalidate then a refresh draw
+		//pulling data from ? with the ability to pull using start offset and end offset
+		//getting chunks the same size as the available graph area that is
+		//width-leftOffset
+		//
+		
+		//graph0.drawSamplesLineChart needs to graph the selected samples block,
+		//or most recent samples block if no scroll has been made
+		if (m_listener != null) m_listener.onScrollUpdate(x,y,xScroll, yScroll);
 		return false;
 	}
 	
