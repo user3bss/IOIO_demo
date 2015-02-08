@@ -8,18 +8,17 @@ import ioio.lib.util.BaseIOIOLooper;
 import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.android.IOIOActivity;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.bmt.custom_classes.AnalogPin;
 import com.bmt.custom_classes.FileIO;
@@ -29,16 +28,37 @@ import com.bmt.customviews.UIGraphView;
 
 
 
-public class GraphActivity extends IOIOActivity{
+public class GraphActivity extends IOIOActivity implements OnClickListener{
 	//private int numConnected_ = 0;
 	boolean show_toast_connection_info = true;
 	//UIKnobSwitch sw_knob0 = null;
 	UIGraphView graph0 = null;
 	String tag = getClass().getSimpleName();
-	ArrayList<FileIO> OutputStreams = null;
-	ArrayList<FileIO> InputStreams = null;
-	ArrayList<AnalogPinFile> analog_pins = null;
-	int sizeOfFloat = 0;
+	//FileIO[] files = null;
+	ToggleButton[] toggleButtons = null;
+	AnalogPinFile[] AnalogPinFiles = null;
+
+	int sizeOfFloat = 4;
+	String[] fileNames = {
+			"PIN31",	//0
+			"PIN32",	//1
+			"PIN33",	//2
+			"PIN34",	//3
+			"PIN35",	//4
+			"PIN36",	//5
+			"PIN37",	//6
+			"PIN38",	//7			
+			"PIN39",	//8
+			"PIN40",	//9
+			"PIN41",	//10
+			"PIN42",	//11
+			"PIN43",	//12
+			"PIN44",	//13
+			"PIN45",	//14
+			"PIN46",	//15
+			
+	};
+	
 	int [] pin_colors = {
 			Color.parseColor("#FF0000"),	//0
 			Color.parseColor("#FF5500"),	//1
@@ -56,46 +76,35 @@ public class GraphActivity extends IOIOActivity{
 			Color.parseColor("#5500FF"),	//14
 			Color.parseColor("#AA00FF")		//15
 	};
-	boolean [] enabled_channels = {
-					//AN  Pin#
-			false,	//0 - 31
-			true,	//1 - 32
-			false,	//2 - 33
-			false,	//3 - 34
-			false,	//4 - 35
-			false,	//5 - 36
-			false,	//6 - 37
-			false,	//7 - 38
-			false,	//8 - 39
-			false,	//9 - 40
-			false,	//10 - 41
-			false,	//12 - 42
-			false,	//13 - 43
-			false,	//14 - 44
-			false	//15 - 45		
+	boolean[] enabled_channels = {
+			false,	//0
+			false,	//1
+			false,	//2
+			false,	//3
+			false,	//4
+			false,	//5
+			false,	//6
+			false,	//7
+			false,	//8
+			false,	//9
+			false,	//10
+			false,	//12
+			false,	//13
+			false,	//14
+			false	//15			
 	};
-	private int getNumEnabledChannels(){
+	/*private int getNumEnabledChannels(){
 		int numEnabledChannels = 0;
 		for(int i=0;i<enabled_channels.length;i++){
 			if(enabled_channels[i])
 				numEnabledChannels++;
 		}
 		return numEnabledChannels;
-	}
+	}*/
 	public void clearFiles(){
-		if(OutputStreams != null){
-			Iterator<FileIO> InputIt = InputStreams.iterator();			
-			Iterator<FileIO> OutputIt = OutputStreams.iterator();
-			//int i = 0;
-			while(OutputIt.hasNext() && InputIt.hasNext()){
-				FileIO fi = InputIt.next();
-				fi.closeFile();
-				OutputIt.next().emptyFile();
-				fi.openFile();
-				//Log.i(tag, "clear index "+i);
-				//i++;
-			}
-		}
+		/*for(int i=0;i<16;i++){
+			files[i].emptyFile();
+		}*/
 	}
 	private void clear_graph(){	
 		runOnUiThread(new Runnable() {
@@ -103,7 +112,7 @@ public class GraphActivity extends IOIOActivity{
 			public void run() {
 				graph0.clear();
 			}
-		});		
+		});
 	}
 
 	private void enableUi(final boolean enable) {
@@ -112,15 +121,15 @@ public class GraphActivity extends IOIOActivity{
 			@Override
 			public void run() {
 				if (enable) {
-					if (numConnected_++ == 0) {
-						graph0.setEnabled(true);
+					//if (numConnected_++ == 0) {
+						//graph0.setEnabled(true);
 						//sw_knob0.setEnabled(true);
-					}
+					//}
 				} else {
-					if (--numConnected_ == 0) {
-						graph0.setEnabled(false);
+					//if (--numConnected_ == 0) {
+						//graph0.setEnabled(false);
 						//sw_knob0.setEnabled(false);						
-					}
+					//}
 				}
 			}
 		});*/
@@ -130,23 +139,52 @@ public class GraphActivity extends IOIOActivity{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.graph_activity);
-		OutputStreams = new ArrayList<FileIO>();
-		InputStreams = new ArrayList<FileIO>();
+
 		Application app = getApplication();
 		
 		Util u = new Util();
 		sizeOfFloat = u.sizeOfFloat();	  //4
 		//int sizeOfInt = u.sizeOfInt();  //4
 		//Log.i(tag, "sizeOfFloat: "+sizeOfFloat+", sizeOfInt:"+sizeOfInt);
+		toggleButtons = new ToggleButton[16];
+		toggleButtons[0] = (ToggleButton) findViewById(R.id.toggleButton1);
+		toggleButtons[0].setTag(new Integer(0));
+		toggleButtons[1] = (ToggleButton) findViewById(R.id.toggleButton2);
+		toggleButtons[1].setTag(new Integer(1));
+		toggleButtons[2] = (ToggleButton) findViewById(R.id.toggleButton3);
+		toggleButtons[2].setTag(new Integer(2));
+		toggleButtons[3] = (ToggleButton) findViewById(R.id.toggleButton4);
+		toggleButtons[3].setTag(new Integer(3));
+		toggleButtons[4] = (ToggleButton) findViewById(R.id.toggleButton5);
+		toggleButtons[4].setTag(new Integer(4));
+		toggleButtons[5] = (ToggleButton) findViewById(R.id.toggleButton6);
+		toggleButtons[5].setTag(new Integer(5));
+		toggleButtons[6] = (ToggleButton) findViewById(R.id.toggleButton7);
+		toggleButtons[6].setTag(new Integer(6));
+		toggleButtons[7] = (ToggleButton) findViewById(R.id.toggleButton8);
+		toggleButtons[7].setTag(new Integer(7));
 		
-		for(int i=0;i<enabled_channels.length;i++){
-			if(enabled_channels[i]){
-				//FileIO.file_location.TEMP is ReadOnly on emulator
-				OutputStreams.add( new FileIO(app, FileIO.file_location.APPTEMP, FileIO.file_mode.WRITE, "PIN"+(i+31)) );
-				InputStreams.add( new FileIO(app, FileIO.file_location.APPTEMP, FileIO.file_mode.READ, "PIN"+(i+31)) );
-			}
-		}
-		clearFiles();
+		toggleButtons[8] = (ToggleButton) findViewById(R.id.toggleButton9);
+		toggleButtons[8].setTag(new Integer(8));
+		toggleButtons[9] = (ToggleButton) findViewById(R.id.toggleButton10);
+		toggleButtons[9].setTag(new Integer(9));
+		toggleButtons[10] = (ToggleButton) findViewById(R.id.toggleButton11);
+		toggleButtons[10].setTag(new Integer(10));
+		toggleButtons[11] = (ToggleButton) findViewById(R.id.toggleButton12);
+		toggleButtons[11].setTag(new Integer(11));
+		toggleButtons[12] = (ToggleButton) findViewById(R.id.toggleButton13);
+		toggleButtons[12].setTag(new Integer(12));
+		toggleButtons[13] = (ToggleButton) findViewById(R.id.toggleButton14);
+		toggleButtons[13].setTag(new Integer(13));
+		toggleButtons[14] = (ToggleButton) findViewById(R.id.toggleButton15);
+		toggleButtons[14].setTag(new Integer(14));
+		toggleButtons[15] = (ToggleButton) findViewById(R.id.toggleButton16);		
+		toggleButtons[15].setTag(new Integer(15));
+		/*for(int i=0;i<16;i++){
+			toggleButtons[i].setOnClickListener(this);
+			files[i] = new FileIO(app, FileIO.file_location.APPTEMP, FileIO.file_mode.READWRITE, "PIN"+(i+31));
+		}*/
+		//clearFiles();
 		
 		/*sw_knob0 = (UIKnobSwitch) findViewById(R.id.sw_knob0);
 		sw_knob0.SetListener(new UIKnobSwitchListener(){
@@ -156,7 +194,7 @@ public class GraphActivity extends IOIOActivity{
 			}			
 		});*/		
 		graph0 = (UIGraphView) findViewById(R.id.graph0);
-		graph0.setFileInputStreams(InputStreams, pin_colors);		
+		graph0.setFilesAndColors(getApplication(), fileNames, pin_colors);		
 	}	
 	@Override
 	protected void onResume() {
@@ -187,11 +225,14 @@ public class GraphActivity extends IOIOActivity{
 		});
 	}
 	public class AnalogPinFile extends AnalogPin {
-		FileOutputStream fs = null;
+		FileIO f = null;
 		String fn = null;
-		public AnalogPinFile(IOIO ioio, int PinNum, FileOutputStream _f) {
+		public AnalogPinFile(IOIO ioio, int PinNum, String fileName) {
 			super(ioio, PinNum);
-			fs = _f;
+			f = new FileIO(getApplication(), FileIO.file_location.APPTEMP, FileIO.file_mode.WRITE, fileName);
+		}
+		public void closeFile(){
+			f.closeFile();
 		}
 		public void readAnalogInBufferedToFile() throws InterruptedException, ConnectionLostException{
 			try {
@@ -199,15 +240,12 @@ public class GraphActivity extends IOIOActivity{
 					if(ioiopina.getOverflowCount() > 0){
 						toast("dropped "+ioiopina.getOverflowCount() + " samples");
 					}
-					int numSampleToRead = ioiopina.available();
-					for(int i=0;i<numSampleToRead;i++){	//reads all available samples
-						float v = ioiopina.getVoltageBuffered();						
-						try {
-							fs.write(ByteBuffer.allocate(sizeOfFloat).putFloat(v).array());
-						} catch (IOException e) {
-							toast("Error writing to stream: "+e.getLocalizedMessage());
-						}
-					}				
+					try {
+						if(f != null)
+							f.getOutputStream().write(readAnalogInByteBuffer());
+					} catch (IOException e) {
+						toast("Error writing to stream: "+e.getLocalizedMessage());
+					}
 				}
 			} catch (Exception e){
 				toast(e.getLocalizedMessage());
@@ -226,21 +264,16 @@ public class GraphActivity extends IOIOActivity{
 			try{
 				enableUi(true);
 				showVersions(ioio_, "IOIO connected!");	 
-				analog_pins = new ArrayList<AnalogPinFile>();
-				Log.i(tag, "numEnabledChannels"+getNumEnabledChannels());
-				Iterator<FileIO> osi = OutputStreams.iterator();
-				String msg = new String();
-				for(int i=0;i<enabled_channels.length;i++){
-					if(enabled_channels[i] && osi.hasNext()){
-						analog_pins.add( new AnalogPinFile(ioio_, i+31, osi.next().getOutputStream()) );
-						msg += "adding analog pin "+(i+31)+"\n";
-					}
+				AnalogPinFiles = new AnalogPinFile[16];
+				for(int i=0;i<16;i++){
+					AnalogPinFiles[i] = new AnalogPinFile(ioio_, i+31, fileNames[i]);
 				}
-				toast(msg);
 				OutputPin led = new OutputPin(ioio_, IOIO.LED_PIN, 0, false);  //mode 3 = open_collector
 				led.writeBit(false); 										   //led is inverted
 				//InputPin InputPin9 = new InputPin(ioio_, 9, 0); 			   //0:pullup, 1:pulldn, 2:float
 				PwmOutput pwmOutput_ = ioio_.openPwmOutput(12, 50);
+				float sr = AnalogPinFiles[0].getIOIO_Pin().getSampleRate();
+				toast("Analog Sample Rate: "+sr);
 				toast("50% duty cycle on pin #12");
 			} catch (Exception e) {
 				toast("setup_Error: "+e.getMessage()+" "+e.getLocalizedMessage());
@@ -253,33 +286,63 @@ public class GraphActivity extends IOIOActivity{
 		}
 		@Override
 		public void disconnected() {
-			enableUi(false);		
+			enableUi(false);
+			for(int i=0;i<16;i++){
+				AnalogPinFiles[i].closeFile();
+			}
+			AnalogPinFiles = null;
 			if(show_toast_connection_info) toast("IOIO disconnected");
 		}	
 		@Override
 		public void loop() {		
 			try {
 				//read the analog pins
-				Iterator<AnalogPinFile> pin = analog_pins.iterator();
-				while(pin.hasNext()){
-					pin.next().readAnalogInBufferedToFile();
+				for(int i=0;i<16;i++){				
+					AnalogPinFiles[i].readAnalogInBufferedToFile();
 				}
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						graph0.filesUpdated();
+						graph0.filesUpdated(enabled_channels);
 					}
 				});		
-				Thread.sleep(200);
+				Thread.sleep(10);
 				//Thread.sleep((1/60) * 1000);				
 			} catch (Exception e) {
 				toast("loop Error: "+e.getLocalizedMessage() );
 			}
 		}
 	}
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.i(tag, "-- ON STOP -- : closing files");
+        try{
+	        graph0.closeFiles();
+	        if(AnalogPinFiles != null){
+				for(int i=0;i<16;i++){
+					AnalogPinFiles[i].closeFile();
+				}
+	        }
+        } catch(Exception e){
+        	Log.e(tag, e.getLocalizedMessage());
+        }
+    }
+	
 	@Override
 	protected IOIOLooper createIOIOLooper() {
 		return new _IOIOLooper();
+	}
+	@Override
+	public void onClick(View arg0) {
+		int index = (Integer) arg0.getTag();
+		if(toggleButtons[index].isChecked()){
+			enabled_channels[index] = true;
+			Log.i(tag, "enabled channel "+index);
+		} else {
+			enabled_channels[index] = false;
+			Log.i(tag, "disabled channel "+index);
+		}
 	}
 
 }

@@ -18,7 +18,7 @@ public class FileIO {
 	    APPTEMP, APPDATA, EXTSTORAGE, APPRESOURCES
 	}
 	public enum file_mode {
-		READ, WRITE
+		READ, WRITE, READWRITE
 	}
 	file_mode fmode;
 	file_location flocation;
@@ -27,7 +27,6 @@ public class FileIO {
 	File _file = null;
 	FileOutputStream fOStream = null;
 	FileInputStream fIStream = null;
-	boolean isopen = false;
 	
 	private void Init(Application app){
 		File tempDir = null;
@@ -105,11 +104,6 @@ public class FileIO {
 		fname = file_name;
 		Init(app);		
 	}
-	public void emptyFile(){
-		closeFile();
-		_file.delete();
-		openFile();
-	}
 	public FileInputStream getInputStream(){
 		return fIStream;
 	}
@@ -127,61 +121,88 @@ public class FileIO {
 		}
 		//Log.i(tag, "File Length: "+_file.length());		
 	}
+	private boolean openOutputStream(){
+		boolean openError = false;
+		try {
+			fOStream = new FileOutputStream(_file, APPEND_MODE);
+		} catch (FileNotFoundException e) {
+			Log.e(tag, "ERROR opening file for WRITE: "+e.getLocalizedMessage()+ ", file:"+path+fname);
+			openError = true;
+		}
+		return openError;
+	}
+	private boolean openInputStream(){
+		boolean openError = false;
+		try {
+			fIStream = new FileInputStream(_file);
+		} catch (FileNotFoundException e) {
+			Log.e(tag, "ERROR opening file for READ: "+e.getLocalizedMessage()+ ", file:"+path+fname);
+			openError = true;
+		}
+		return openError;
+	}
+	private void closeInputStream(){
+		if(fIStream != null){
+			try {
+				fIStream.close();
+				fIStream = null;
+			} catch (IOException e) {
+				Log.e(tag, "ERROR: "+e.getLocalizedMessage());
+			}
+		}		
+	}
+	private void closeOutputStream(){
+		if(fOStream != null){
+			try {
+				fOStream.close();
+				fOStream = null;
+			} catch (IOException e) {
+				Log.e(tag, "ERROR: "+e.getLocalizedMessage());
+			}
+		}		
+	}
+	public void emptyFile(){
+		closeFile();
+		_file.delete();
+		openFile();
+	}	
 	public boolean openFile(){
 		boolean openError = false;
-		if(!isopen && !_file.isDirectory()){
+		if(!_file.isDirectory()){
 			createFileIfNotExist();		
 			switch(fmode){
 				case READ:
-					try {
-						fIStream = new FileInputStream(_file);
-						isopen = true;
-					} catch (FileNotFoundException e) {
-						Log.e(tag, "ERROR opening file for READ: "+e.getLocalizedMessage()+ ", file:"+path+fname);
-						openError = true;
-					}
+					openError = openInputStream();
 					break;
 				case WRITE:
-					try {
-						fOStream = new FileOutputStream(_file, APPEND_MODE);
-						isopen = true;
-					} catch (FileNotFoundException e) {
-						Log.e(tag, "ERROR opening file for WRITE: "+e.getLocalizedMessage()+ ", file:"+path+fname);
-						openError = true;
-					}
+					openError = openOutputStream();
+					break;
+				case READWRITE:
+					openError = openInputStream() & openOutputStream();
 					break;
 			}
 		}
 		return openError;
-	}	
+	}
 	public void closeFile(){
-		if(isopen && !_file.isDirectory()){
+		if(!_file.isDirectory()){
 			switch(fmode){
 				case READ:
-					if(fIStream != null){
-						try {
-							fIStream.close();
-						} catch (IOException e) {
-							Log.e(tag, "ERROR: "+e.getLocalizedMessage());
-						}
-					}
+					closeInputStream();
 					break;
 				case WRITE:
-					if(fOStream != null){
-						try {
-							fOStream.close();
-						} catch (IOException e) {
-							Log.e(tag, "ERROR: "+e.getLocalizedMessage());
-						}
-					}					
+					closeOutputStream();
+					break;
+				case READWRITE:
+					closeInputStream();
+					closeOutputStream();
 					break;
 			}
 		}
-		isopen = false;
 	}
 	public boolean writeByte(int b){
 		boolean didWriteData = false;
-		if(isopen && _file.canWrite()){				
+		if(_file.canWrite() && fOStream != null){				
 			try {
 				fOStream.write(b);
 			} catch (IOException e) {
@@ -195,7 +216,7 @@ public class FileIO {
 	}	
 	public boolean writeByteBuffer(byte[] buffer){
 		boolean didWriteData = false;
-		if(isopen && _file.canWrite()){				
+		if(_file.canWrite() && fOStream != null){				
 			try {
 				fOStream.write(buffer);
 			} catch (IOException e) {
@@ -209,7 +230,7 @@ public class FileIO {
 	}
 	public boolean writeByteBuffer(byte[] buffer, int byteOffset, int byteCount){
 		boolean didWriteData = false;
-		if(isopen && _file.canWrite()){				
+		if(_file.canWrite() && fOStream != null){				
 			try {
 				fOStream.write(buffer, byteOffset, byteCount);
 			} catch (IOException e) {
@@ -223,7 +244,7 @@ public class FileIO {
 	}	
 	public byte[] readByteBuffer(){
 		byte[] buffer = null;
-		if(isopen && _file.canRead()){				
+		if(_file.canRead() && fIStream != null){				
 			try {
 				fIStream.read(buffer);
 			} catch (IOException e) {
@@ -236,7 +257,7 @@ public class FileIO {
 	}
 	public byte[] readByteBuffer(int byteOffset, int byteCount){
 		byte[] buffer = null;
-		if(isopen && _file.canRead()){				
+		if(_file.canRead() && fIStream != null){				
 			try {
 				fIStream.read(buffer, byteOffset, byteCount);
 			} catch (IOException e) {
@@ -250,7 +271,7 @@ public class FileIO {
 	
 	public int readByte(){
 		int b = -2^31;
-		if(isopen && _file.canRead()){				
+		if(_file.canRead() && fIStream != null){				
 			try {
 				b = fIStream.read();
 			} catch (IOException e) {
