@@ -2,6 +2,7 @@ package com.bmt.ioio_demo;
 
 import ioio.lib.api.IOIO;
 import ioio.lib.api.IOIO.VersionType;
+import ioio.lib.api.PwmOutput;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
 import ioio.lib.util.IOIOLooper;
@@ -10,6 +11,8 @@ import ioio.lib.util.android.IOIOActivity;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import android.app.Application;
 import android.content.Context;
@@ -20,20 +23,21 @@ import android.widget.Toast;
 
 import com.bmt.custom_classes.AnalogPin;
 import com.bmt.custom_classes.FileIO;
+import com.bmt.custom_classes.OutputPin;
 import com.bmt.custom_classes.Util;
 import com.bmt.customviews.UIGraphView;
 
 
 
 public class GraphActivity extends IOIOActivity{
-	private int numConnected_ = 0;
+	//private int numConnected_ = 0;
 	boolean show_toast_connection_info = true;
 	//UIKnobSwitch sw_knob0 = null;
 	UIGraphView graph0 = null;
 	String tag = getClass().getSimpleName();
-	FileIO[] OutputStreams = null;
-	FileIO[] InputStreams = null;
-	AnalogPinFile[] analog_pins = null;
+	ArrayList<FileIO> OutputStreams = null;
+	ArrayList<FileIO> InputStreams = null;
+	ArrayList<AnalogPinFile> analog_pins = null;
 	int sizeOfFloat = 0;
 	int [] pin_colors = {
 			Color.parseColor("#FF0000"),	//0
@@ -79,11 +83,17 @@ public class GraphActivity extends IOIOActivity{
 		return numEnabledChannels;
 	}
 	public void clearFiles(){
-		if(OutputStreams != null && InputStreams != null && OutputStreams.length == InputStreams.length){
-			for(int i=0;i<OutputStreams.length;i++){
-				InputStreams[i].closeFile();
-				OutputStreams[i].emptyFile();
-				InputStreams[i].openFile();
+		if(OutputStreams != null){
+			Iterator<FileIO> InputIt = InputStreams.iterator();			
+			Iterator<FileIO> OutputIt = OutputStreams.iterator();
+			//int i = 0;
+			while(OutputIt.hasNext() && InputIt.hasNext()){
+				FileIO fi = InputIt.next();
+				fi.closeFile();
+				OutputIt.next().emptyFile();
+				fi.openFile();
+				//Log.i(tag, "clear index "+i);
+				//i++;
 			}
 		}
 	}
@@ -120,8 +130,8 @@ public class GraphActivity extends IOIOActivity{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.graph_activity);
-		OutputStreams = new FileIO[getNumEnabledChannels()];
-		InputStreams = new FileIO[getNumEnabledChannels()];
+		OutputStreams = new ArrayList<FileIO>();
+		InputStreams = new ArrayList<FileIO>();
 		Application app = getApplication();
 		
 		Util u = new Util();
@@ -132,8 +142,8 @@ public class GraphActivity extends IOIOActivity{
 		for(int i=0;i<enabled_channels.length;i++){
 			if(enabled_channels[i]){
 				//FileIO.file_location.TEMP is ReadOnly on emulator
-				OutputStreams[i] = new FileIO(app, FileIO.file_location.APPTEMP, FileIO.file_mode.WRITE, "PIN"+(i+31));
-				InputStreams[i] = new FileIO(app, FileIO.file_location.APPTEMP, FileIO.file_mode.READ, "PIN"+(i+31));
+				OutputStreams.add( new FileIO(app, FileIO.file_location.APPTEMP, FileIO.file_mode.WRITE, "PIN"+(i+31)) );
+				InputStreams.add( new FileIO(app, FileIO.file_location.APPTEMP, FileIO.file_mode.READ, "PIN"+(i+31)) );
 			}
 		}
 		clearFiles();
@@ -146,15 +156,7 @@ public class GraphActivity extends IOIOActivity{
 			}			
 		});*/		
 		graph0 = (UIGraphView) findViewById(R.id.graph0);
-		graph0.setFileInputStreams(InputStreams, pin_colors);
-		
-		/*graph0.SetListener(new UIGraphViewListener(){
-			@Override
-			public void onScrollUpdate(float x, float y, float xScroll, float yScroll) {
-				//using callback for fling bc this instance 
-				//has a referance to graph0 and the sample data
-			}			
-		});*/
+		graph0.setFileInputStreams(InputStreams, pin_colors);		
 	}	
 	@Override
 	protected void onResume() {
@@ -192,18 +194,23 @@ public class GraphActivity extends IOIOActivity{
 			fs = _f;
 		}
 		public void readAnalogInBufferedToFile() throws InterruptedException, ConnectionLostException{
-			if(ioiopina != null){
-				printDroppedSamples();
-				int numSampleToRead = ioiopina.available();
-				for(int i=0;i<numSampleToRead;i++){	//reads all available samples
-					float v = ioiopina.getVoltageBuffered();
-					byte[] b = ByteBuffer.allocate(sizeOfFloat).putFloat(v).array();
-					try {
-						fs.write(b);
-					} catch (IOException e) {
-						Log.e(tag, "Error writing to stream: "+e.getLocalizedMessage());
+			try {
+				if(ioiopina != null){
+					if(ioiopina.getOverflowCount() > 0){
+						toast("dropped "+ioiopina.getOverflowCount() + " samples");
 					}
-				}				
+					int numSampleToRead = ioiopina.available();
+					for(int i=0;i<numSampleToRead;i++){	//reads all available samples
+						float v = ioiopina.getVoltageBuffered();						
+						try {
+							fs.write(ByteBuffer.allocate(sizeOfFloat).putFloat(v).array());
+						} catch (IOException e) {
+							toast("Error writing to stream: "+e.getLocalizedMessage());
+						}
+					}				
+				}
+			} catch (Exception e){
+				toast(e.getLocalizedMessage());
 			}
 		}
 	}
@@ -219,16 +226,22 @@ public class GraphActivity extends IOIOActivity{
 			try{
 				enableUi(true);
 				showVersions(ioio_, "IOIO connected!");	 
-				analog_pins = new AnalogPinFile[getNumEnabledChannels()];
+				analog_pins = new ArrayList<AnalogPinFile>();
 				Log.i(tag, "numEnabledChannels"+getNumEnabledChannels());
+				Iterator<FileIO> osi = OutputStreams.iterator();
+				String msg = new String();
 				for(int i=0;i<enabled_channels.length;i++){
-					if(enabled_channels[i])
-						analog_pins[i] = new AnalogPinFile(ioio_, i+31, OutputStreams[i].getOutputStream());
+					if(enabled_channels[i] && osi.hasNext()){
+						analog_pins.add( new AnalogPinFile(ioio_, i+31, osi.next().getOutputStream()) );
+						msg += "adding analog pin "+(i+31)+"\n";
+					}
 				}
-				//OutputPins.put("led", new OutputPin(0,3,false));  //mode 3 = open_collector
-				//Thread.sleep(250);
-				//OutputPins.get("led").writeBit(true);  //mode 3 = OPEN_DRAIN
-				//InputPin9 = new InputPin(9, 0); //0:pullup, 1:pulldn, 2:float			
+				toast(msg);
+				OutputPin led = new OutputPin(ioio_, IOIO.LED_PIN, 0, false);  //mode 3 = open_collector
+				led.writeBit(false); 										   //led is inverted
+				//InputPin InputPin9 = new InputPin(ioio_, 9, 0); 			   //0:pullup, 1:pulldn, 2:float
+				PwmOutput pwmOutput_ = ioio_.openPwmOutput(12, 50);
+				toast("50% duty cycle on pin #12");
 			} catch (Exception e) {
 				toast("setup_Error: "+e.getMessage()+" "+e.getLocalizedMessage());
 			}			
@@ -247,15 +260,20 @@ public class GraphActivity extends IOIOActivity{
 		public void loop() {		
 			try {
 				//read the analog pins
-				for(int i=0;i<analog_pins.length;i++){
-					if(enabled_channels[i])
-						analog_pins[i].readAnalogInBufferedToFile();
+				Iterator<AnalogPinFile> pin = analog_pins.iterator();
+				while(pin.hasNext()){
+					pin.next().readAnalogInBufferedToFile();
 				}
-				graph0.filesUpdated();
-				Thread.sleep(100);
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						graph0.filesUpdated();
+					}
+				});		
+				Thread.sleep(200);
 				//Thread.sleep((1/60) * 1000);				
 			} catch (Exception e) {
-				toast("loop Error: "+e.getMessage()+" , "+e.getLocalizedMessage() );
+				toast("loop Error: "+e.getLocalizedMessage() );
 			}
 		}
 	}

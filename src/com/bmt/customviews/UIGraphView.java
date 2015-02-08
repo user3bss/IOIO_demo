@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -24,6 +25,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.bmt.custom_classes.FileIO;
 import com.bmt.custom_classes.Util;
@@ -46,10 +48,12 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 	protected int textLeftPadding = 20;
 	//private boolean isScrolling = false;
 	
-	private FileIO[] fiStreams = null;
+	private ArrayList<FileIO> fiStreams = null;
 	private int[] colors = null;
 	private int numGraphPointsXaxis = 0;
 	int sizeOfFloat = 0;
+	
+	Context c = null;
 	
 	private void init(){
         final GestureDetector gdt = new GestureDetector(this);
@@ -63,29 +67,32 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 		Util u = new Util();
 		sizeOfFloat = u.sizeOfFloat();
 	}
-	public UIGraphView(Context c) {
-		super(c);
+	public UIGraphView(Context _c) {
+		super(_c);
+		c = _c;
 		setupPaint();		
 		init();
 	}
-	public UIGraphView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		setPaintOptions(context, attrs);
+	public UIGraphView(Context _c, AttributeSet attrs) {
+		super(_c, attrs);
+		c = _c;
+		setPaintOptions(_c, attrs);
 		init();
 	}
 
-	public UIGraphView(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		setPaintOptions(context, attrs);
+	public UIGraphView(Context _c, AttributeSet attrs, int defStyle) {
+		super(_c, attrs, defStyle);
+		c = _c;
+		setPaintOptions(_c, attrs);
 		init();
 	}
-	public void setFileInputStreams(FileIO[] _fiStreams, int[] _colors){
+	public void setFileInputStreams(ArrayList<FileIO> _fiStreams, int[] _colors){
 		fiStreams = _fiStreams;
 		colors = _colors;
 	}
 	public void filesUpdated(){
 		//if scroll is at end of data display the new data coming in.
-		Log.i(tag, "numGraphPointsXaxis: "+numGraphPointsXaxis);
+		//Log.i(tag, "numGraphPointsXaxis: "+numGraphPointsXaxis);
 		//graph0.drawSamplesLineChart(p.samples, color); //pass the data directly
 		//drawSamplesLineChart(p.samples, color, int start, int end);
 		
@@ -97,36 +104,43 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 		background_bitmap.eraseColor(Color.TRANSPARENT);	//don't want to erase backgroundImage, commenting doesn't erase anything
 		tiCanvas.drawPath(border_path, border_paint);
 		drawGraphLines(4, 4, leftOffset, 0); //have to draw text labels too		
-		
-		if(fiStreams != null && numGraphPointsXaxis > 0){
-			for(int i=0;i<fiStreams.length;i++){
-				FileInputStream fs = fiStreams[i].getInputStream();
-				long fl = fiStreams[i].fileLength();
-				byte[] buffer = new byte[numGraphPointsXaxis * sizeOfFloat];
-				int byteOffset = (int) fiStreams[i].fileLength() - (numGraphPointsXaxis * sizeOfFloat);	//4 bytes for each float
-				if(byteOffset < (numGraphPointsXaxis * sizeOfFloat)){
-					break;
-				}
-				Log.i(tag, "File Length: "+fl + " buffer length" + buffer.length+ " offset: "+byteOffset);
-				try {
-					int numBytesRead = fs.read(buffer, byteOffset, (numGraphPointsXaxis * sizeOfFloat));
-					
-					if(numBytesRead > 0){
-						//convert byte[] to float[]
-						FloatBuffer fb = ByteBuffer.wrap(buffer).asFloatBuffer();
-						float[] f = new float[fb.capacity()];
-						fb.get(f); 					// Copy the contents of the FloatBuffer into dst						
-						
-						Log.i(tag, "numGraphPointsXaxis: "+numGraphPointsXaxis+" f.length"+f.length);
-						//drawLineChart(fArray, colors[i]);						
-						line_chart lc = new line_chart();
-						lc._BitmapPaint.setColor(colors[i]);
-						lc.drawValues(tiCanvas, f, leftOffset);		
+		try{
+			if(fiStreams != null && numGraphPointsXaxis > 0 && colors.length >= fiStreams.size()){
+				Iterator<FileIO> fsI = fiStreams.iterator();
+				int i = 0;
+				while(fsI.hasNext()){
+					FileIO fInput = fsI.next();
+					FileInputStream fs = fInput.getInputStream();
+					long fl = fInput.fileLength();
+					byte[] buffer = new byte[numGraphPointsXaxis * sizeOfFloat];
+					int byteOffset = (int) fl - (numGraphPointsXaxis * sizeOfFloat);	//4 bytes for each float
+					if(byteOffset < (numGraphPointsXaxis * sizeOfFloat)){
+						break;
 					}
-				} catch (IOException e) {
-					Log.e(tag, e.getLocalizedMessage());
+					Log.i(tag, "File Length: "+fl + " buffer length" + buffer.length+ " offset: "+byteOffset);
+					try {
+						int numBytesRead = fs.read(buffer, byteOffset, (numGraphPointsXaxis * sizeOfFloat));
+						
+						if(numBytesRead > 0){
+							//convert byte[] to float[]
+							FloatBuffer fb = ByteBuffer.wrap(buffer).asFloatBuffer();
+							float[] f = new float[fb.capacity()];
+							fb.get(f); 					// Copy the contents of the FloatBuffer into dst						
+							
+							Log.i(tag, "numGraphPointsXaxis: "+numGraphPointsXaxis+" f.length"+f.length);
+							//drawLineChart(fArray, colors[i]);						
+							line_chart lc = new line_chart();
+							lc._BitmapPaint.setColor(colors[i]);
+							lc.drawValues(tiCanvas, f, leftOffset);		
+						}
+					} catch (IOException e) {
+						Toast.makeText(c, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+					}
+					i++;
 				}
 			}
+		} catch (Exception e) {
+			Toast.makeText(c, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 		}
 		invalidate(); //draw to screen
 	}
