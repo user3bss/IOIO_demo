@@ -16,11 +16,15 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector.OnGestureListener;
+import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.bmt.custom_classes.AnalogPin;
 import com.bmt.custom_classes.FileIO;
+import com.bmt.custom_classes.Util;
 import com.bmt.customviews.UIGraphView;
+
 
 
 public class GraphActivity extends IOIOActivity{
@@ -32,6 +36,7 @@ public class GraphActivity extends IOIOActivity{
 	FileIO[] OutputStreams = null;
 	FileIO[] InputStreams = null;
 	AnalogPinFile[] analog_pins = null;
+	int sizeOfFloat = 0;
 	int [] pin_colors = {
 			Color.parseColor("#FF0000"),	//0
 			Color.parseColor("#FF5500"),	//1
@@ -91,13 +96,6 @@ public class GraphActivity extends IOIOActivity{
 			}
 		});		
 	}
-			
-		//graph0.drawSamplesLineChart(p.samples, color); //pass the data directly
-		//drawSamplesLineChart(p.samples, color, int start, int end);
-		
-		//TODO need to filter samples according to scroll here??		
-		//graph0.drawLineChart(p.getSamples(), color); //convert arraylist<float> to float[] 
-		//TODO use paging for render frames???
 
 	private void enableUi(final boolean enable) {
 		// This is slightly trickier than expected to support a multi-IOIO use-case.
@@ -127,6 +125,11 @@ public class GraphActivity extends IOIOActivity{
 		InputStreams = new FileIO[getNumEnabledChannels()];
 		Application app = getApplication();
 		
+		Util u = new Util();
+		sizeOfFloat = u.sizeOfFloat();	  //4
+		//int sizeOfInt = u.sizeOfInt();  //4
+		//Log.i(tag, "sizeOfFloat: "+sizeOfFloat+", sizeOfInt:"+sizeOfInt);
+		
 		for(int i=0;i<enabled_channels.length;i++){
 			if(enabled_channels[i]){
 				//FileIO.file_location.TEMP is ReadOnly on emulator
@@ -145,6 +148,7 @@ public class GraphActivity extends IOIOActivity{
 		});*/		
 		graph0 = (UIGraphView) findViewById(R.id.graph0);
 		graph0.setFileInputStreams(InputStreams, pin_colors);
+		
 		/*graph0.SetListener(new UIGraphViewListener(){
 			@Override
 			public void onScrollUpdate(float x, float y, float xScroll, float yScroll) {
@@ -193,8 +197,8 @@ public class GraphActivity extends IOIOActivity{
 				printDroppedSamples();
 				int numSampleToRead = ioiopina.available();
 				for(int i=0;i<numSampleToRead;i++){	//reads all available samples
-					float v = (float) ioiopina.getVoltageBuffered();
-					byte[] b = ByteBuffer.allocate(4).putFloat(v).array();
+					float v = ioiopina.getVoltageBuffered();
+					byte[] b = ByteBuffer.allocate(sizeOfFloat).putFloat(v).array();
 					try {
 						fs.write(b);
 					} catch (IOException e) {
@@ -260,4 +264,5 @@ public class GraphActivity extends IOIOActivity{
 	protected IOIOLooper createIOIOLooper() {
 		return new _IOIOLooper();
 	}
+
 }

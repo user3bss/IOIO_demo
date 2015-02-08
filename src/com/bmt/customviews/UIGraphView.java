@@ -6,6 +6,10 @@
 
 package com.bmt.customviews;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import android.content.Context;
@@ -17,16 +21,17 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector.OnGestureListener;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.bmt.custom_classes.FileIO;
+import com.bmt.custom_classes.Util;
 import com.bmt.custom_classes.line_chart;
 import com.bmt.ioio_demo.R;
 
 
-public class UIGraphView extends View implements OnGestureListener{
+public class UIGraphView extends View implements GestureDetector.OnGestureListener{
 	private Path border_path = null;
 	private Path graph_lines_path = null;
 	
@@ -44,19 +49,35 @@ public class UIGraphView extends View implements OnGestureListener{
 	private FileIO[] fiStreams = null;
 	private int[] colors = null;
 	private int numGraphPointsXaxis = 0;
+	int sizeOfFloat = 0;
 	
+	private void init(){
+        final GestureDetector gdt = new GestureDetector(this);
+        this.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(final View view, final MotionEvent event) {
+                gdt.onTouchEvent(event);
+                return true;
+            }
+        });	
+		Util u = new Util();
+		sizeOfFloat = u.sizeOfFloat();
+	}
 	public UIGraphView(Context c) {
 		super(c);
-		setupPaint();
+		setupPaint();		
+		init();
 	}
 	public UIGraphView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setPaintOptions(context, attrs);
+		init();
 	}
 
 	public UIGraphView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		setPaintOptions(context, attrs);
+		init();
 	}
 	public void setFileInputStreams(FileIO[] _fiStreams, int[] _colors){
 		fiStreams = _fiStreams;
@@ -65,6 +86,49 @@ public class UIGraphView extends View implements OnGestureListener{
 	public void filesUpdated(){
 		//if scroll is at end of data display the new data coming in.
 		Log.i(tag, "numGraphPointsXaxis: "+numGraphPointsXaxis);
+		//graph0.drawSamplesLineChart(p.samples, color); //pass the data directly
+		//drawSamplesLineChart(p.samples, color, int start, int end);
+		
+		//TODO need to filter samples according to scroll here??		
+		//graph0.drawLineChart(p.getSamples(), color); //convert arraylist<float> to float[] 
+		//TODO use paging for render frames???
+		
+		//Clear Graph
+		background_bitmap.eraseColor(Color.TRANSPARENT);	//don't want to erase backgroundImage, commenting doesn't erase anything
+		tiCanvas.drawPath(border_path, border_paint);
+		drawGraphLines(4, 4, leftOffset, 0); //have to draw text labels too		
+		
+		if(fiStreams != null && numGraphPointsXaxis > 0){
+			for(int i=0;i<fiStreams.length;i++){
+				FileInputStream fs = fiStreams[i].getInputStream();
+				long fl = fiStreams[i].fileLength();
+				byte[] buffer = new byte[numGraphPointsXaxis * sizeOfFloat];
+				int byteOffset = (int) fiStreams[i].fileLength() - (numGraphPointsXaxis * sizeOfFloat);	//4 bytes for each float
+				if(byteOffset < (numGraphPointsXaxis * sizeOfFloat)){
+					break;
+				}
+				Log.i(tag, "File Length: "+fl + " buffer length" + buffer.length+ " offset: "+byteOffset);
+				try {
+					int numBytesRead = fs.read(buffer, byteOffset, (numGraphPointsXaxis * sizeOfFloat));
+					
+					if(numBytesRead > 0){
+						//convert byte[] to float[]
+						FloatBuffer fb = ByteBuffer.wrap(buffer).asFloatBuffer();
+						float[] f = new float[fb.capacity()];
+						fb.get(f); 					// Copy the contents of the FloatBuffer into dst						
+						
+						Log.i(tag, "numGraphPointsXaxis: "+numGraphPointsXaxis+" f.length"+f.length);
+						//drawLineChart(fArray, colors[i]);						
+						line_chart lc = new line_chart();
+						lc._BitmapPaint.setColor(colors[i]);
+						lc.drawValues(tiCanvas, f, leftOffset);		
+					}
+				} catch (IOException e) {
+					Log.e(tag, e.getLocalizedMessage());
+				}
+			}
+		}
+		invalidate(); //draw to screen
 	}
 	/*public interface UIGraphViewListener {
 		public void onScrollUpdate(float x, float y, float xScroll, float yScroll);
@@ -119,7 +183,7 @@ public class UIGraphView extends View implements OnGestureListener{
 		   } finally {
 		       a.recycle();
 		   }		  
-	}
+	}	
 	
 	public void drawLineChart(float[] f, int c){
 		line_chart lc = new line_chart();
@@ -245,7 +309,6 @@ public class UIGraphView extends View implements OnGestureListener{
 		//tiCanvas.scale(1,-1,tiCanvas.getWidth()/2,tiCanvas.getHeight()/2);		
 		invalidate();
 	}
-
 	@Override
 	public boolean onScroll(MotionEvent ondown, MotionEvent currentMove, float distanceX, float distanceY) {
 		Log.i(tag, "onScroll fired");
@@ -272,25 +335,44 @@ public class UIGraphView extends View implements OnGestureListener{
 		//graph0.drawSamplesLineChart needs to graph the selected samples block,
 		//or most recent samples block if no scroll has been made
 		//if (m_listener != null) m_listener.onScrollUpdate(x,y,xScroll, yScroll);
-		return false;
+		return true;
 	}
-	
 	@Override
 	public boolean onDown(MotionEvent arg0) {
-		return false;
+		Log.i(tag, "onDown");
+		return true;
+	}
+	
+    private static final int SWIPE_MIN_DISTANCE = 120;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 200;	
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+	       float velocityY) {
+		Log.i(tag, "onFling");
+        if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+            return false; // Right to left
+        }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+            return false; // Left to right
+        }
+
+        if(e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+            return false; // Bottom to top
+        }  else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+            return false; // Top to bottom
+        }
+        return false;
 	}
 	@Override
-	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,	float arg3) {
-		return false;
-	}
-	@Override
-	public void onLongPress(MotionEvent arg0) {		
+	public void onLongPress(MotionEvent arg0) {	
+		Log.i(tag, "onLongPress");
 	}	
 	@Override
-	public void onShowPress(MotionEvent arg0) {		
+	public void onShowPress(MotionEvent arg0) {	
+		Log.i(tag, "onShowPress");
 	}
 	@Override
 	public boolean onSingleTapUp(MotionEvent arg0) {
-		return false;
+		Log.i(tag, "onSingleTapUp");
+		return true;
 	}
 }
