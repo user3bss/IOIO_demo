@@ -9,6 +9,8 @@
    </declare-styleable>
    <declare-styleable name="LED"> 
        <attr name="ison" format="boolean" />
+       <attr name="ledon_color" format="string"/>
+       <attr name="ledoff_color" format="string"/>
        <attr name="ledon_image" format="reference"/>
        <attr name="ledoff_image" format="reference" />              
    </declare-styleable>

@@ -60,22 +60,38 @@ theme attribute (in the form
 containing a value of this type.
          */
         public static final int ison=0x7f010005;
+        /** <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int ledoff_color=0x7f010007;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int ledoff_image=0x7f010007;
+        public static final int ledoff_image=0x7f010009;
+        /** <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int ledon_color=0x7f010006;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int ledon_image=0x7f010006;
+        public static final int ledon_image=0x7f010008;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int off_image=0x7f01000d;
+        public static final int off_image=0x7f01000f;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int on_image=0x7f01000c;
+        public static final int on_image=0x7f01000e;
         /** <p>Must be an integer value, such as "<code>100</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -83,15 +99,15 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int position=0x7f010008;
+        public static final int position=0x7f01000a;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int rotor_image=0x7f01000a;
+        public static final int rotor_image=0x7f01000c;
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
          */
-        public static final int stator_image=0x7f010009;
+        public static final int stator_image=0x7f01000b;
         /** <p>Must be an integer value, such as "<code>100</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -99,7 +115,7 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
-        public static final int value=0x7f01000b;
+        public static final int value=0x7f01000d;
     }
     public static final class drawable {
         public static final int dots=0x7f020000;
@@ -214,15 +230,20 @@ containing a value of this type.
            <colgroup align="left" />
            <tr><th>Attribute</th><th>Description</th></tr>
            <tr><td><code>{@link #LED_ison com.bmt.ioio_demo:ison}</code></td><td></td></tr>
+           <tr><td><code>{@link #LED_ledoff_color com.bmt.ioio_demo:ledoff_color}</code></td><td></td></tr>
            <tr><td><code>{@link #LED_ledoff_image com.bmt.ioio_demo:ledoff_image}</code></td><td></td></tr>
+           <tr><td><code>{@link #LED_ledon_color com.bmt.ioio_demo:ledon_color}</code></td><td></td></tr>
            <tr><td><code>{@link #LED_ledon_image com.bmt.ioio_demo:ledon_image}</code></td><td></td></tr>
            </table>
            @see #LED_ison
+           @see #LED_ledoff_color
            @see #LED_ledoff_image
+           @see #LED_ledon_color
            @see #LED_ledon_image
          */
         public static final int[] LED = {
-            0x7f010005, 0x7f010006, 0x7f010007
+            0x7f010005, 0x7f010006, 0x7f010007, 0x7f010008,
+            0x7f010009
         };
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#ison}
@@ -239,6 +260,20 @@ containing a value of this type.
         */
         public static final int LED_ison = 0;
         /**
+          <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#ledoff_color}
+          attribute's value can be found in the {@link #LED} array.
+
+
+          <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name com.bmt.ioio_demo:ledoff_color
+        */
+        public static final int LED_ledoff_color = 2;
+        /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#ledoff_image}
           attribute's value can be found in the {@link #LED} array.
 
@@ -247,7 +282,21 @@ containing a value of this type.
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
           @attr name com.bmt.ioio_demo:ledoff_image
         */
-        public static final int LED_ledoff_image = 2;
+        public static final int LED_ledoff_image = 4;
+        /**
+          <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#ledon_color}
+          attribute's value can be found in the {@link #LED} array.
+
+
+          <p>Must be a string value, using '\\;' to escape characters such as '\\n' or '\\uxxxx' for a unicode character.
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name com.bmt.ioio_demo:ledon_color
+        */
+        public static final int LED_ledon_color = 1;
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#ledon_image}
           attribute's value can be found in the {@link #LED} array.
@@ -257,7 +306,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
           @attr name com.bmt.ioio_demo:ledon_image
         */
-        public static final int LED_ledon_image = 1;
+        public static final int LED_ledon_image = 3;
         /** Attributes that can be used with a UIGraphView.
            <p>Includes the following attributes:</p>
            <table>
@@ -368,7 +417,7 @@ containing a value of this type.
            @see #UIKnob_value
          */
         public static final int[] UIKnob = {
-            0x7f01000b, 0x7f01000c, 0x7f01000d
+            0x7f01000d, 0x7f01000e, 0x7f01000f
         };
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#off_image}
@@ -419,7 +468,7 @@ containing a value of this type.
            @see #UIKnobSwitch_stator_image
          */
         public static final int[] UIKnobSwitch = {
-            0x7f010008, 0x7f010009, 0x7f01000a
+            0x7f01000a, 0x7f01000b, 0x7f01000c
         };
         /**
           <p>This symbol is the offset where the {@link com.bmt.ioio_demo.R.attr#position}

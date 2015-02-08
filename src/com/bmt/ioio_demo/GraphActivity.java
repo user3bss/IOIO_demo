@@ -16,8 +16,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.GestureDetector.OnGestureListener;
-import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.bmt.custom_classes.AnalogPin;
@@ -55,21 +53,22 @@ public class GraphActivity extends IOIOActivity{
 			Color.parseColor("#AA00FF")		//15
 	};
 	boolean [] enabled_channels = {
-			true,	//0
-			false,	//1
-			false,	//2
-			false,	//3
-			false,	//4
-			false,	//5
-			false,	//6
-			false,	//7
-			false,	//8
-			false,	//9
-			false,	//10
-			false,	//12
-			false,	//13
-			false,	//14
-			false	//15			
+					//AN  Pin#
+			false,	//0 - 31
+			true,	//1 - 32
+			false,	//2 - 33
+			false,	//3 - 34
+			false,	//4 - 35
+			false,	//5 - 36
+			false,	//6 - 37
+			false,	//7 - 38
+			false,	//8 - 39
+			false,	//9 - 40
+			false,	//10 - 41
+			false,	//12 - 42
+			false,	//13 - 43
+			false,	//14 - 44
+			false	//15 - 45		
 	};
 	private int getNumEnabledChannels(){
 		int numEnabledChannels = 0;

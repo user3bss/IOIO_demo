@@ -19,78 +19,103 @@ import com.bmt.ioio_demo.R;
 
 public class LED extends View{
 	private Canvas ctx = null;
-	private Paint tiBitmapPaintOn = null;
-	private Paint tiBitmapPaintOff = null;
-	private Bitmap LEDon = null;
-	private Bitmap LEDoff = null;
+	private Paint BitmapPaintOn = null;
+	private Paint BitmapPaintOff = null;
+	private Paint BitmapPaintStroke = null;
+	//private Bitmap LEDon = null;
+	//private Bitmap LEDoff = null;
+	String default_LEDOnColor = "#FF0000";
+	String default_LEDOffColor = "#990000";
 	private Bitmap background = null;
-	int default_LEDon_image = R.drawable.ledon;
-	int default_LEDoff_image = R.drawable.ledoff;
+	//int default_LEDon_image = R.drawable.ledon;
+	//int default_LEDoff_image = R.drawable.ledoff;
 	boolean ison = false;
 	String tag = getClass().getSimpleName();	
 	Context c = null;
 	Matrix scale_matrix = null;
 	
-	/*public interface LEDListener {
-		public void onChange(boolean b);
-	}
-	private LEDListener m_listener = null;
-	public void SetListener(LEDListener uiLEDListener) {
-		m_listener = uiLEDListener;
-	}*/
 	private void setPaintOptions() {
-		tiBitmapPaintOn = new Paint();
-		tiBitmapPaintOn.setAntiAlias(true);
-		tiBitmapPaintOn.setDither(true);
-		tiBitmapPaintOn.setColor(Color.parseColor("#FF0000"));
-		tiBitmapPaintOn.setStyle(Paint.Style.FILL_AND_STROKE);
-		tiBitmapPaintOn.setStrokeJoin(Paint.Join.ROUND);
-		tiBitmapPaintOn.setStrokeCap(Paint.Cap.ROUND);
-		tiBitmapPaintOn.setStrokeWidth(8);
-		tiBitmapPaintOn.setAlpha(128);
-		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);
+		BitmapPaintStroke = new Paint();
+		BitmapPaintStroke.setDither(true);		
+		BitmapPaintStroke.setStyle(Paint.Style.STROKE);
+		BitmapPaintStroke.setStrokeJoin(Paint.Join.ROUND);
+		BitmapPaintStroke.setStrokeCap(Paint.Cap.ROUND);
+		BitmapPaintStroke.setStrokeWidth(2);
+		BitmapPaintStroke.setAlpha(128);		
+		BitmapPaintStroke.setColor(Color.parseColor("#333333"));
+		BitmapPaintStroke.setAntiAlias(true);
 		
-		tiBitmapPaintOff = new Paint();
-		tiBitmapPaintOff.setAntiAlias(true);
-		tiBitmapPaintOff.setDither(true);
-		tiBitmapPaintOff.setColor(Color.parseColor("#990000"));
-		tiBitmapPaintOff.setStyle(Paint.Style.FILL_AND_STROKE);
-		tiBitmapPaintOff.setStrokeJoin(Paint.Join.ROUND);
-		tiBitmapPaintOff.setStrokeCap(Paint.Cap.ROUND);
-		tiBitmapPaintOff.setStrokeWidth(8);
-		tiBitmapPaintOff.setAlpha(128);		
+		BitmapPaintOn = new Paint();
+		BitmapPaintOn.setDither(true);		
+		BitmapPaintOn.setStyle(Paint.Style.FILL);
+		BitmapPaintOn.setStrokeJoin(Paint.Join.ROUND);
+		BitmapPaintOn.setStrokeCap(Paint.Cap.ROUND);
+		BitmapPaintOn.setAlpha(128);
+		//BitmapPaint = new Paint(Paint.DITHER_FLAG);
+		
+		BitmapPaintOff = new Paint();
+		BitmapPaintOff.setDither(true);
+
+		BitmapPaintOff.setStyle(Paint.Style.FILL);
+		BitmapPaintOff.setStrokeJoin(Paint.Join.ROUND);
+		BitmapPaintOff.setStrokeCap(Paint.Cap.ROUND);
+		BitmapPaintOff.setStrokeWidth(8);
+		BitmapPaintOff.setAlpha(128);
+		
+		BitmapPaintOn.setColor(Color.parseColor(default_LEDOnColor));
+		BitmapPaintOff.setColor(Color.parseColor(default_LEDOffColor));
 	}
-	public void set_LEDon_image(int r){
+	/*public void set_LEDon_image(int r){
 		LEDon = BitmapFactory.decodeResource(c.getResources(), r);		
 	}
 	public void set_LEDoff_image(int r){
 		LEDoff = BitmapFactory.decodeResource(c.getResources(), r);		
-	}	
-	private void setPaintOptions(AttributeSet attrs) {			   
-		TypedArray a = c.getTheme().obtainStyledAttributes(attrs, R.styleable.LED, 0, 0);
-	   try {
-		   int on = a.getResourceId(R.styleable.LED_ledon_image, default_LEDon_image);
-		   set_LEDon_image(on);			   
-		   int off = a.getResourceId(R.styleable.LED_ledoff_image, default_LEDoff_image);
-		   set_LEDoff_image(off);
-		   ison = a.getBoolean(R.styleable.LED_ison, false);
+	}*/	
+	private void setPaintOptions(AttributeSet attrs) {
+		/*TypedArray a = c.getTheme().obtainStyledAttributes(attrs, R.styleable.LED, 0, 0);
+		try{
+			ison = a.getBoolean(R.styleable.LED_ison, false);
+			if(!isInEditMode()){			   
+			   //int on = a.getResourceId(R.styleable.LED_ledon_image, default_LEDon_image);
+			   //set_LEDon_image(on);			   
+			   //int off = a.getResourceId(R.styleable.LED_ledoff_image, default_LEDoff_image);
+			   //set_LEDoff_image(off);
+			   			   
+			   String _LEDOnColor = a.getString(R.styleable.LED_ledon_color);
+			   String _LEDOffColor = a.getString(R.styleable.LED_ledoff_color);		       
+			   if(_LEDOnColor.length() == 7){
+				   try{
+					   Color.parseColor(_LEDOnColor);
+					   default_LEDOnColor = _LEDOnColor;					
+				   } catch (Exception e){				   
+				   }
+			   }			   
+			   if(_LEDOnColor.length() == 7){			   
+				   try{
+					   Color.parseColor(_LEDOffColor);
+					   default_LEDOffColor = _LEDOffColor;
+				   } catch (Exception e){				   
+				   }
+			   }
+		   }
+		   BitmapPaintOn.setColor(Color.parseColor(default_LEDOnColor));
+		   BitmapPaintOff.setColor(Color.parseColor(default_LEDOffColor));
 		   invalidate();
 	   } finally {
-	       a.recycle();
-	   }		  
+		   a.recycle();
+	   }*/
 	}
 	public LED(Context context) {
 		super(context);
 		c = context;
 		setPaintOptions();
-		set_LEDon_image(default_LEDon_image);
-		set_LEDoff_image(default_LEDoff_image);
+		//set_LEDon_image(default_LEDon_image);
+		//set_LEDoff_image(default_LEDoff_image);
 	}
 	public LED(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		c = context;
 		setPaintOptions();
-		Log.i(tag, "using attrs0");
 		setPaintOptions(attrs);
 	}
 
@@ -98,9 +123,13 @@ public class LED extends View{
 		super(context, attrs, defStyle);
 		c = context;
 		setPaintOptions();
-		Log.i(tag, "using attrs1");
 		setPaintOptions(attrs);
-	}	
+	}
+	public void setIsOn(boolean _ison){
+		ison = _ison; 
+		invalidate();
+	}
+	
 	@Override
 	public Parcelable onSaveInstanceState() {
 	    Bundle bundle = new Bundle();
@@ -131,17 +160,15 @@ public class LED extends View{
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-	    canvas.drawBitmap(background, 0, 0, tiBitmapPaintOff);	    
-		if(ison && LEDon != null)
+	    canvas.drawBitmap(background, 0, 0, BitmapPaintOff);	    
+		/*if(ison && LEDon != null)
 			canvas.drawBitmap(LEDon, scale_matrix, tiBitmapPaintOff);
 		else if(LEDoff != null)
-			canvas.drawBitmap(LEDoff, scale_matrix, tiBitmapPaintOff);
-		else if(ison)
-			canvas.drawCircle(20, 20, 15, tiBitmapPaintOn);
+			canvas.drawBitmap(LEDoff, scale_matrix, tiBitmapPaintOff);*/
+		if(ison)
+			canvas.drawCircle(12, 12, 8, BitmapPaintOn);
 		else
-			canvas.drawCircle(20, 20, 15, tiBitmapPaintOff);
+			canvas.drawCircle(12, 12, 8, BitmapPaintOff);
+		canvas.drawCircle(12, 12, 8, BitmapPaintStroke);
 	}
-	
-	//TODO create touchevent Listener for toggle LED
-	//if (m_listener != null) m_listener.onChange(mState);
 }

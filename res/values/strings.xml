@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">IOIO_demo</string>
     <string name="hello_world">Hello world!</string>
-    <string name="seekbar_label">Move to control the position:</string>
-    <string name="analog_label">Analog reading:</string>
+    <string name="seekbar_label">Move to control the position on pin #12:</string>
+    <string name="analog_label">Analog reading pin #40:</string>
 </resources>
