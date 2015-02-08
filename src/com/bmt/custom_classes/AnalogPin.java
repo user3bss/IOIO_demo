@@ -1,7 +1,6 @@
 package com.bmt.custom_classes;
 
-import java.util.ArrayList;
-
+//import java.util.ArrayList;
 import ioio.lib.api.AnalogInput;
 import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;
@@ -12,18 +11,18 @@ public class AnalogPin {
 	public AnalogInput ioiopina = null;  //31-46
 	private int pin_num;
 	private float RefVolts = (float) 3.3;
-	public ArrayList<Float> samples = null;
-	
+	//public ArrayList<Float> samples = null;	
 	public int getPinNum(){
 		return pin_num;
 	}
-	public float[] getSamples(){
+	/*public float[] getSamples(){
 		float[] f = new float[samples.size()];
 		for(int i=0;i<samples.size();i++){
 			f[i] = samples.get(i);
 		}
 		return f;
-	}
+		return samples;
+	}*/
 	public AnalogPin(IOIO ioio, int PinNum) {
 		pin_num = PinNum;
 		try {					
@@ -34,30 +33,32 @@ public class AnalogPin {
 				RefVolts = ioiopina.getReference();
 				//Log.i(tag, "Reference Voltage: " + RefVolts+", SampleRate: "+sr );				
 			}
-			samples = new ArrayList<Float>();
-			
+			//samples = new ArrayList<Float>();
 		} catch (ConnectionLostException e) {
 			ioiopina = null;
 		}		
 	}
-	public float readAnalogInBuffered() throws InterruptedException, ConnectionLostException{
-		float v = 0;
+	public float[] readAnalogInBuffered() throws InterruptedException, ConnectionLostException{
+		float[] samples = null;
 		if(ioiopina != null){			
 			printDroppedSamples();
 			int numSampleToRead = ioiopina.available();
+			samples = new float[numSampleToRead];
 			for(int i=0;i<numSampleToRead;i++){	//reads all available samples
-				samples.add( ioiopina.getVoltageBuffered() );
-				//v = ioiopina.readBuffered();
+				//samples.add( ioiopina.getVoltageBuffered() );
+				//float v = ioiopina.readBuffered();
+				samples[i] = (float) ioiopina.getVoltageBuffered();
 			}
 		}
-		return v;
+		return samples;
 	}
 	public float readAnalogInUnBuffered() throws InterruptedException, ConnectionLostException{
 		float v = 0;
 		if(ioiopina != null){			
 			printDroppedSamples();
-			samples.add( ioiopina.getVoltage() );
+			//samples.add( ioiopina.getVoltage() );
 			//v = ioiopina.read();
+			v = ioiopina.getVoltage();
 		}
 		return v;			
 	}

@@ -21,6 +21,7 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.bmt.custom_classes.FileIO;
 import com.bmt.custom_classes.line_chart;
 import com.bmt.ioio_demo.R;
 
@@ -40,14 +41,42 @@ public class UIGraphView extends View implements OnGestureListener{
 	protected int textLeftPadding = 20;
 	//private boolean isScrolling = false;
 	
-	public interface UIGraphViewListener {
+	private FileIO[] fiStreams = null;
+	private int[] colors = null;
+	private int numGraphPointsXaxis = 0;
+	
+	public UIGraphView(Context c) {
+		super(c);
+		setupPaint();
+	}
+	public UIGraphView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		setPaintOptions(context, attrs);
+	}
+
+	public UIGraphView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		setPaintOptions(context, attrs);
+	}
+	public void setFileInputStreams(FileIO[] _fiStreams, int[] _colors){
+		fiStreams = _fiStreams;
+		colors = _colors;
+	}
+	public void filesUpdated(){
+		//if scroll is at end of data display the new data coming in.
+		Log.i(tag, "numGraphPointsXaxis: "+numGraphPointsXaxis);
+	}
+	/*public interface UIGraphViewListener {
 		public void onScrollUpdate(float x, float y, float xScroll, float yScroll);
 	}
 	private UIGraphViewListener m_listener = null;
 	public void SetListener(UIGraphViewListener uiGraphViewListener) {
 		m_listener = uiGraphViewListener;
-	}
-	
+	}*/
+	/*
+	abstract boolean 	onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
+						Notified when a scroll occurs with the initial on down MotionEvent and the current move MotionEvent.
+	 */	
 	private void setPaintDefaults(Paint p, String c){
 		p.setAntiAlias(true);
 		p.setDither(true);
@@ -90,20 +119,8 @@ public class UIGraphView extends View implements OnGestureListener{
 		   } finally {
 		       a.recycle();
 		   }		  
-	}	
-	public UIGraphView(Context c) {
-		super(c);
-		setupPaint();
 	}
-	public UIGraphView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		setPaintOptions(context, attrs);		
-	}
-
-	public UIGraphView(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		setPaintOptions(context, attrs);
-	}	
+	
 	public void drawLineChart(float[] f, int c){
 		line_chart lc = new line_chart();
 		lc._BitmapPaint.setColor(c);
@@ -164,6 +181,8 @@ public class UIGraphView extends View implements OnGestureListener{
 			graph_lines_path.lineTo(width, ((i+1)*divisor));			
 		}		
 		float divisorV = (width-leftOffset)/numlinesX;
+		numGraphPointsXaxis = width-leftOffset;
+		
 		for(int i=0;i<numlinesY-1;i++){
 			graph_lines_path.moveTo(leftOffset+((i+1)*divisorV), 0 );
 			graph_lines_path.lineTo(leftOffset+((i+1)*divisorV), tiCanvas.getHeight() );	
@@ -192,7 +211,7 @@ public class UIGraphView extends View implements OnGestureListener{
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		//if(!isInEditMode()){		
-			Log.d(tag, "onSizeChanged: ");
+			Log.d(tag, "onSizeChanged w:"+w+", h:");
 			super.onSizeChanged(w, h, oldw, oldh);
 			background_bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
 			tiCanvas = new Canvas(background_bitmap);			
@@ -226,16 +245,21 @@ public class UIGraphView extends View implements OnGestureListener{
 		//tiCanvas.scale(1,-1,tiCanvas.getWidth()/2,tiCanvas.getHeight()/2);		
 		invalidate();
 	}
-/*
-abstract boolean 	onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
-					Notified when a scroll occurs with the initial on down MotionEvent and the current move MotionEvent.
- */
+
 	@Override
 	public boolean onScroll(MotionEvent ondown, MotionEvent currentMove, float distanceX, float distanceY) {
+		Log.i(tag, "onScroll fired");
 		float x = ondown.getX() / ((float) getWidth());
 		float y = ondown.getY() / ((float) getHeight());
 		float xScroll = currentMove.getX()  / ((float) getWidth());
 		float yScroll = currentMove.getY()  / ((float) getHeight());
+		
+		if(currentMove.getActionMasked() == MotionEvent.ACTION_MOVE){
+			Log.i(tag, "Action Move");
+			Log.i(tag, "X: "+x+", Y:"+y);
+			Log.i(tag, "xScroll: "+xScroll+", yScroll: "+yScroll);
+			Log.i(tag, "xDistance: "+distanceX+", yDistance"+distanceY);
+		}
 		//e2.getYPrecision()			
 		//float mm = e2.getTouchMajor() + e2.getTouchMinor();
 		
@@ -247,7 +271,7 @@ abstract boolean 	onScroll(MotionEvent e1, MotionEvent e2, float distanceX, floa
 		
 		//graph0.drawSamplesLineChart needs to graph the selected samples block,
 		//or most recent samples block if no scroll has been made
-		if (m_listener != null) m_listener.onScrollUpdate(x,y,xScroll, yScroll);
+		//if (m_listener != null) m_listener.onScrollUpdate(x,y,xScroll, yScroll);
 		return false;
 	}
 	
