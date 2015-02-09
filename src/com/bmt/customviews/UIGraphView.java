@@ -55,14 +55,16 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 	Context c = null;
 	
 	private void init(){
-        final GestureDetector gdt = new GestureDetector(this);
-        this.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(final View view, final MotionEvent event) {
-                gdt.onTouchEvent(event);
-                return true;
-            }
-        });	
+		if(!isInEditMode()){
+	        final GestureDetector gdt = new GestureDetector(this);
+	        this.setOnTouchListener(new OnTouchListener() {
+	            @Override
+	            public boolean onTouch(final View view, final MotionEvent event) {
+	                gdt.onTouchEvent(event);
+	                return true;
+	            }
+	        });
+		}
 		Util u = new Util();
 		sizeOfFloat = u.sizeOfFloat();
 	}

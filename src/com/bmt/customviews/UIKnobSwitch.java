@@ -16,6 +16,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
+import android.view.View.OnTouchListener;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -24,7 +25,7 @@ import com.bmt.ioio_demo.R;
 public class UIKnobSwitch extends View implements OnGestureListener {
 	private Canvas ctx = null;
 	private Paint tiBitmapPaint = null;
-	private GestureDetector 	gestureDetector;
+	//private GestureDetector 	gestureDetector;
 	private float 				mAngleDown , mAngleUp, mAngle;
 	private Bitmap background = null;
 	private Bitmap rotor = null;
@@ -48,6 +49,19 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		m_listener = uiKnobListener;
 	}
 	
+	private void Init(){
+		if(!isInEditMode()){
+			//gestureDetector = new GestureDetector(c, this);
+	        final GestureDetector gdt = new GestureDetector(this);
+	        this.setOnTouchListener(new OnTouchListener() {
+	            @Override
+	            public boolean onTouch(final View view, final MotionEvent event) {
+	                gdt.onTouchEvent(event);
+	                return true;
+	            }
+	        });
+		}		
+	}
 	public  UIKnobSwitch(Context context) {
 		super(context);
 		c = context;
@@ -55,16 +69,14 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		set_stator_image(default_stator_image);
 		set_rotor_image(default_rotor_image);
 		set_position(0);		
-		if(!isInEditMode())
-			gestureDetector = new GestureDetector(c, this);
+		Init();
 	}
 	public  UIKnobSwitch(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		c = context;
 		setPaintOptions();
 		setPaintOptions(attrs);
-		if(!isInEditMode())
-			gestureDetector = new GestureDetector(c, this);
+		Init();
 	}
 
 	public  UIKnobSwitch(Context context, AttributeSet attrs, int defStyle) {
@@ -72,8 +84,7 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		c = context;
 		setPaintOptions();
 		setPaintOptions(attrs);
-		if(!isInEditMode())
-			gestureDetector = new GestureDetector(c, this);
+		Init();
 	}	  
 	public void set_stator_image(int r){
 		stator = BitmapFactory.decodeResource(c.getResources(), r);		
@@ -154,8 +165,7 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 				invalidate();
 		   } finally {
 		       a.recycle();
-		   }
-		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);		  
+		   }		  
 	}
 
 	
@@ -237,6 +247,7 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		return (float) -Math.toDegrees(Math.atan2(x - 0.5f, y - 0.5f));
 	}	
 	private void setRotorPosAngle(float deg) {
+		Log.i(tag, "setRotorPosAngle: "+deg);
 		if (deg >= 210 || deg <= 150) {
 			if (deg > 180) deg = deg - 360;
 			
@@ -266,6 +277,7 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 	}
 	
 	private boolean setAngle(MotionEvent e2){
+		Log.i(tag, "setAngle: "+e2);
 		if(enabled){
 			float x = e2.getX() / ((float) getWidth());
 			float y = e2.getY() / ((float) getHeight());
@@ -288,11 +300,13 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 	}
 	@Override 
 	public boolean onTouchEvent(MotionEvent event) {
-		if (gestureDetector.onTouchEvent(event)) return true;
-		else return super.onTouchEvent(event);
+		//if (gestureDetector.onTouchEvent(event)) return true;
+		//else return super.onTouchEvent(event);
+		return super.onTouchEvent(event);
 	}
 	@Override
 	public boolean onDown(MotionEvent event) {
+		Log.i(tag, "onDown "+enabled);
 		if(enabled){
 			float x = event.getX() / ((float) getWidth());
 			float y = event.getY() / ((float) getHeight());
@@ -302,6 +316,7 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 	}	
 	@Override	
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+		Log.i(tag, "onScroll "+enabled);
 		return setAngle(e2);
 	}
 	@Override

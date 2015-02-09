@@ -37,8 +37,6 @@ public class LED extends View{
 		super(context);
 		c = context;
 		setPaintOptions();
-		//set_LEDon_image(default_LEDon_image);
-		//set_LEDoff_image(default_LEDoff_image);
 	}
 	public LED(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -179,7 +177,9 @@ public class LED extends View{
 			canvas.drawCircle(this.getMeasuredWidth()/2, this.getMeasuredHeight()/2, this.getMeasuredWidth()/2-(1*metrics.scaledDensity), BitmapPaintOn);
 		else
 			canvas.drawCircle(this.getMeasuredWidth()/2, this.getMeasuredHeight()/2, this.getMeasuredWidth()/2-(1*metrics.scaledDensity), BitmapPaintOff);
-		canvas.drawCircle(this.getMeasuredWidth()/2, this.getMeasuredHeight()/2, this.getMeasuredWidth()/2-(1*metrics.scaledDensity), BitmapPaintStroke);
+
+		if(LEDoff == null && LEDon == null)	//Stroke the circle
+			canvas.drawCircle(this.getMeasuredWidth()/2, this.getMeasuredHeight()/2, this.getMeasuredWidth()/2-(1*metrics.scaledDensity), BitmapPaintStroke);
 	}
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

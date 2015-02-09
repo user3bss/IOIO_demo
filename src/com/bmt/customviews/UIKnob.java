@@ -15,6 +15,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
+import android.view.View.OnTouchListener;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -23,14 +24,14 @@ import com.bmt.ioio_demo.R;
 public class UIKnob extends View implements OnGestureListener {
 	private Canvas ctx = null;
 	private Paint tiBitmapPaint = null;
-	private GestureDetector 	gestureDetector;
+	//private GestureDetector 	gestureDetector;
 	private float 				mAngleDown , mAngleUp, mAngle;
 	private Bitmap background = null;
 	private Bitmap rotorOn = null;
 	private Bitmap rotorOff = null;
 	private Bitmap stator = null;
 	private boolean mState = false;	
-	private Path tiPath = null;	
+	//private Path tiPath = null;	
 	private int stateToSave;
 	private boolean enabled = true;
 	String tag = getClass().getSimpleName();	
@@ -40,7 +41,19 @@ public class UIKnob extends View implements OnGestureListener {
 	DisplayMetrics metrics = null;
 	String msg = null;
 	
-	
+	private void Init(){
+		if(!isInEditMode()){
+			//gestureDetector = new GestureDetector(c, this);
+	        final GestureDetector gdt = new GestureDetector(this);
+	        this.setOnTouchListener(new OnTouchListener() {
+	            @Override
+	            public boolean onTouch(final View view, final MotionEvent event) {
+	                gdt.onTouchEvent(event);
+	                return true;
+	            }
+	        });
+		}		
+	}
 	public interface UIKnobListener {
 		public void onStateChange(boolean newstate);
 		public void onRotate(int percentage);
@@ -54,16 +67,14 @@ public class UIKnob extends View implements OnGestureListener {
 		super(context);
 		c = context;
 		setPaintOptions();
-		if(!isInEditMode())
-			gestureDetector = new GestureDetector(c, this);
+		Init();
 	}
 	public UIKnob(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		c = context;
 		setPaintOptions();
 		setPaintOptions(attrs);
-		if(!isInEditMode())
-			gestureDetector = new GestureDetector(c, this);
+		Init();
 	}
 
 	public  UIKnob(Context context, AttributeSet attrs, int defStyle) {
@@ -71,8 +82,7 @@ public class UIKnob extends View implements OnGestureListener {
 		c = context;
 		setPaintOptions();
 		setPaintOptions(attrs);
-		if(!isInEditMode())
-			gestureDetector = new GestureDetector(c, this);
+		Init();
 	} 	
 	public void setEnabled(boolean s){
 		enabled = s;
@@ -251,8 +261,9 @@ public class UIKnob extends View implements OnGestureListener {
 	}
 	
 	@Override public boolean onTouchEvent(MotionEvent event) {
-		if (gestureDetector.onTouchEvent(event)) return true;
-		else return super.onTouchEvent(event);
+		//if (gestureDetector.onTouchEvent(event)) return true;
+		//else return super.onTouchEvent(event);
+		return super.onTouchEvent(event);
 	}
 	@Override
 	public boolean onDown(MotionEvent event) {

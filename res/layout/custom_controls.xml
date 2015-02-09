@@ -47,6 +47,8 @@
 
         <com.bmt.customviews.UIKnobSwitch
             android:layout_width="125dp"
-            android:layout_height="125dp" />
+            android:layout_height="125dp"
+            app:position="1" />
+
     </LinearLayout>
 </LinearLayout>
