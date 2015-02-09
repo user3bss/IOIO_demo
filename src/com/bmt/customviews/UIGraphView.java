@@ -6,12 +6,10 @@
 
 package com.bmt.customviews;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import android.app.Application;
 import android.content.Context;
@@ -168,7 +166,9 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 		p.setStrokeJoin(Paint.Join.ROUND);
 		p.setStrokeCap(Paint.Cap.ROUND);
 		p.setStrokeWidth(2);
-		p.setAlpha(255);		
+		p.setAlpha(255);
+		if(!isInEditMode())
+			p.setShadowLayer(4, 2, 2, 0x80000000);
 	}	
 	private void setupPaint(){
 		border_paint = new Paint();
@@ -275,10 +275,17 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 		//prepare and draw sine wave
 		if(isInEditMode()){
 			float[] v = new float[width-leftOffset];
+			float[] sq = new float[width-leftOffset];
+			float[] t = new float[width-leftOffset];
+			float[] s = new float[width-leftOffset];
 			for(int i=0;i<width-leftOffset;i++){
 				v[i] = (float) (1.65 * Math.sin(i*0.05) + 1.65); //.017 rad = 1 deg
+				sq[i] = (float) (Math.signum( Math.sin(2*Math.PI*i*0.005))+1.65);
+				t[i] = Math.abs(v[i]);
 			}
-			drawLineChart(v, Color.RED);			
+			drawLineChart(v, Color.RED);
+			drawLineChart(t, Color.GREEN);
+			drawLineChart(sq, Color.CYAN);
 		}
 	}
 	protected void draw_border(){

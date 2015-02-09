@@ -56,7 +56,7 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		set_rotor_image(default_rotor_image);
 		set_position(0);		
 		if(!isInEditMode())
-			gestureDetector = new GestureDetector(getContext(), this);
+			gestureDetector = new GestureDetector(c, this);
 	}
 	public  UIKnobSwitch(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -64,7 +64,7 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		setPaintOptions();
 		setPaintOptions(attrs);
 		if(!isInEditMode())
-			gestureDetector = new GestureDetector(getContext(), this);
+			gestureDetector = new GestureDetector(c, this);
 	}
 
 	public  UIKnobSwitch(Context context, AttributeSet attrs, int defStyle) {
@@ -73,9 +73,45 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		setPaintOptions();
 		setPaintOptions(attrs);
 		if(!isInEditMode())
-			gestureDetector = new GestureDetector(getContext(), this);
+			gestureDetector = new GestureDetector(c, this);
 	}	  
-
+	public void set_stator_image(int r){
+		stator = BitmapFactory.decodeResource(c.getResources(), r);		
+	}
+	public void set_stator_image(Bitmap b){
+		stator = b;
+	}
+	public void set_rotor_image(int r){
+		rotor = BitmapFactory.decodeResource(c.getResources(), r);		
+	}
+	public void set_rotor_image(Bitmap b){
+		rotor = b;		
+	}
+	public void set_position(int _position){
+	   	switch(_position){
+	   		case 0:
+	   			setRotorPosAngle(-144);
+	   			break;
+	   		case 1:
+	   			setRotorPosAngle(-90);
+	   			break;
+	   		case 2:
+	   			setRotorPosAngle(0);
+	   			break;
+	   		case 3:
+	   			setRotorPosAngle(90);
+	   			break;
+	   		case 4:
+	   			setRotorPosAngle(144);
+	   			break;
+	   		default:
+	   			setRotorPosAngle(-144);	   			
+	   			break;
+	   	}
+	}	
+	public void setEnabled(boolean b){
+		enabled = b;
+	}
 	@Override
 	public Parcelable onSaveInstanceState() {
 	    Bundle bundle = new Bundle();
@@ -121,40 +157,82 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		   }
 		//tiBitmapPaint = new Paint(Paint.DITHER_FLAG);		  
 	}
-	public void set_stator_image(int r){
-		stator = BitmapFactory.decodeResource(c.getResources(), r);		
-	}
-	public void set_stator_image(Bitmap b){
-		stator = b;
-	}
-	public void set_rotor_image(int r){
-		rotor = BitmapFactory.decodeResource(c.getResources(), r);		
-	}
-	public void set_rotor_image(Bitmap b){
-		rotor = b;		
-	}
-	public void set_position(int _position){
-	   	switch(_position){
-	   		case 0:
-	   			setRotorPosAngle(-144);
-	   			break;
-	   		case 1:
-	   			setRotorPosAngle(-90);
-	   			break;
-	   		case 2:
-	   			setRotorPosAngle(0);
-	   			break;
-	   		case 3:
-	   			setRotorPosAngle(90);
-	   			break;
-	   		case 4:
-	   			setRotorPosAngle(144);
-	   			break;
-	   		default:
-	   			setRotorPosAngle(-144);	   			
-	   			break;
-	   	}
+
+	
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+		super.onSizeChanged(w, h, oldw, oldh);
+		//if(w==0 || h == 0) return;
+		background = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+		ctx = new Canvas(background);
+	    metrics = getResources().getDisplayMetrics();
+		scale_matrix = new Matrix();		
+		float scale = (this.getMeasuredWidth()/metrics.scaledDensity) / 250.0f;	//graphic size is 250
+		scale_matrix.setScale(scale, scale);
+		matrix = new Matrix();
+		matrix.postScale(scale, scale);			
+		invalidate();
 	}	
+
+	@Override
+	protected void onDraw(Canvas canvas) {
+	    int left = getPaddingLeft();
+	    int top = getPaddingTop();
+	    int right = getWidth() - getPaddingRight();
+	    int bottom = getHeight() - getPaddingBottom();
+	    
+		canvas.drawBitmap(background, 0, 0, tiBitmapPaint);
+		if(stator != null)	canvas.drawBitmap(stator, scale_matrix, tiBitmapPaint);	
+		//matrix.postRotate(mAngle, (this.getMeasuredWidth()/metrics.scaledDensity)/2, (this.getMeasuredWidth()/metrics.scaledDensity)/2);				
+		if(rotor != null)	canvas.drawBitmap(rotor, matrix, tiBitmapPaint);
+		canvas.drawText("test", 0, 0, tiBitmapPaint);
+		//canvas.drawCircle((this.getMeasuredWidth()/2)/metrics.scaledDensity, (this.getMeasuredHeight()/2)/metrics.scaledDensity, (this.getMeasuredWidth()/2-1)/metrics.scaledDensity, tiBitmapPaint);
+		/*if (tiPath != null) {
+			canvas.drawPath(tiPath, tiBitmapPaint);
+		}*/		
+	}
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
+	    int desiredWidth = 100;
+	    int desiredHeight = 100;
+
+	    int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+	    int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+	    int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+	    int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+	    int width;
+	    int height;
+
+	    //Measure Width
+	    if (widthMode == MeasureSpec.EXACTLY) {
+	        //Must be this size
+	        width = widthSize;
+	    } else if (widthMode == MeasureSpec.AT_MOST) {
+	        //Can't be bigger than...
+	        width = Math.min(desiredWidth, widthSize);
+	    } else {
+	        //Be whatever you want
+	        width = desiredWidth;
+	    }
+
+	    //Measure Height
+	    if (heightMode == MeasureSpec.EXACTLY) {
+	        //Must be this size
+	        height = heightSize;
+	    } else if (heightMode == MeasureSpec.AT_MOST) {
+	        //Can't be bigger than...
+	        height = Math.min(desiredHeight, heightSize);
+	    } else {
+	        //Be whatever you want
+	        height = desiredHeight;
+	    }
+
+	    //MUST CALL THIS
+	    setMeasuredDimension(width, height);
+	}
+	
 	private float cartesianToPolar(float x, float y) {
 		return (float) -Math.toDegrees(Math.atan2(x - 0.5f, y - 0.5f));
 	}	
@@ -185,54 +263,8 @@ public class UIKnobSwitch extends View implements OnGestureListener {
    			if (m_listener != null) m_listener.onChange(position);			
 			invalidate();
 		}
-	}	
-	
-	public void setEnabled(boolean b){
-		enabled = b;
 	}
 	
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		super.onSizeChanged(w, h, oldw, oldh);
-		//if(w==0 || h == 0) return;
-		background = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-		ctx = new Canvas(background);
-	    metrics = getResources().getDisplayMetrics();
-		scale_matrix = new Matrix();	
-		float scale = (this.getWidth()/metrics.scaledDensity) / 250.0f;	//graphic size is 250
-		scale_matrix.setScale(scale, scale);
-		matrix = new Matrix();
-		matrix.postScale(scale, scale);			
-		invalidate();
-	}	
-
-	@Override
-	protected void onDraw(Canvas canvas) {    
-		canvas.drawBitmap(background, 0, 0, tiBitmapPaint);
-		if(stator != null)
-			canvas.drawBitmap(stator, scale_matrix, tiBitmapPaint);	
-		matrix.postRotate(mAngle, (this.getWidth()/metrics.scaledDensity)/2, (this.getWidth()/metrics.scaledDensity)/2);				
-		if(rotor != null)
-			canvas.drawBitmap(rotor, matrix, tiBitmapPaint);		
-		
-		/*if (tiPath != null) {
-			canvas.drawPath(tiPath, tiBitmapPaint);
-		}*/		
-	}
-	
-	@Override 
-	public boolean onTouchEvent(MotionEvent event) {
-		if (gestureDetector.onTouchEvent(event)) return true;
-		else return super.onTouchEvent(event);
-	}	
-	public boolean onDown(MotionEvent event) {
-		if(enabled){
-			float x = event.getX() / ((float) getWidth());
-			float y = event.getY() / ((float) getHeight());
-			mAngleDown = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
-		}
-		return true;
-	}
 	private boolean setAngle(MotionEvent e2){
 		if(enabled){
 			float x = e2.getX() / ((float) getWidth());
@@ -254,6 +286,20 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 		}
 		return false;		
 	}
+	@Override 
+	public boolean onTouchEvent(MotionEvent event) {
+		if (gestureDetector.onTouchEvent(event)) return true;
+		else return super.onTouchEvent(event);
+	}
+	@Override
+	public boolean onDown(MotionEvent event) {
+		if(enabled){
+			float x = event.getX() / ((float) getWidth());
+			float y = event.getY() / ((float) getHeight());
+			mAngleDown = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
+		}
+		return true;
+	}	
 	@Override	
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
 		return setAngle(e2);
@@ -265,18 +311,14 @@ public class UIKnobSwitch extends View implements OnGestureListener {
 	@Override
 	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
 			float arg3) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void onLongPress(MotionEvent arg0) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void onShowPress(MotionEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 }

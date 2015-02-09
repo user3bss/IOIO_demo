@@ -38,16 +38,42 @@ public class UIKnob extends View implements OnGestureListener {
 	Matrix scale_matrix = null;
 	Matrix matrix = null;
 	DisplayMetrics metrics = null;
+	String msg = null;
+	
 	
 	public interface UIKnobListener {
-		public void onStateChange(boolean newstate) ;
+		public void onStateChange(boolean newstate);
 		public void onRotate(int percentage);
 	}
 	private UIKnobListener m_listener = null;
+	
 	public void SetListener(UIKnobListener uiKnobListener) {
 		m_listener = uiKnobListener;
 	}	
-	
+	public UIKnob(Context context) {
+		super(context);
+		c = context;
+		setPaintOptions();
+		if(!isInEditMode())
+			gestureDetector = new GestureDetector(c, this);
+	}
+	public UIKnob(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		c = context;
+		setPaintOptions();
+		setPaintOptions(attrs);
+		if(!isInEditMode())
+			gestureDetector = new GestureDetector(c, this);
+	}
+
+	public  UIKnob(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		c = context;
+		setPaintOptions();
+		setPaintOptions(attrs);
+		if(!isInEditMode())
+			gestureDetector = new GestureDetector(c, this);
+	} 	
 	public void setEnabled(boolean s){
 		enabled = s;
 	}	
@@ -56,6 +82,31 @@ public class UIKnob extends View implements OnGestureListener {
 		invalidate();
 		//ivRotor.setImageBitmap(state?bmpRotorOn:bmpRotorOff);
 	}
+	  @Override
+	  public Parcelable onSaveInstanceState() {
+
+	    Bundle bundle = new Bundle();
+	    bundle.putParcelable("instanceState", super.onSaveInstanceState());
+	    bundle.putInt("stateToSave", this.stateToSave);
+	    bundle.putFloat("mAngle", mAngle);
+	    bundle.putBoolean("mState", mState);
+	    // ... save everything
+	    return bundle;
+	  }
+
+	  @Override
+	  public void onRestoreInstanceState(Parcelable state) {
+
+	    if (state instanceof Bundle) {
+	      Bundle bundle = (Bundle) state;
+	      this.stateToSave = bundle.getInt("stateToSave");
+	      this.mAngle = bundle.getFloat("mAngle");
+	      this.mState = bundle.getBoolean("mState");
+	      // ... load everything
+	      state = bundle.getParcelable("instanceState");
+	    }
+	    super.onRestoreInstanceState(state);
+	  }	
 	private void setPaintOptions() {
 		tiBitmapPaint = new Paint();
 		tiBitmapPaint.setAntiAlias(true);
@@ -84,57 +135,8 @@ public class UIKnob extends View implements OnGestureListener {
 		   } finally {
 		       a.recycle();
 		   }		  
-	}	
-	public UIKnob(Context context) {
-		super(context);
-		c = context;
-		setPaintOptions();
-		if(!isInEditMode())
-			gestureDetector = new GestureDetector(getContext(), this);
-	}
-	public UIKnob(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		c = context;
-		setPaintOptions();
-		setPaintOptions(attrs);
-		if(!isInEditMode())
-			gestureDetector = new GestureDetector(getContext(), this);
-	}
+	}	 
 
-	public  UIKnob(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		c = context;
-		setPaintOptions();
-		setPaintOptions(attrs);
-		if(!isInEditMode())
-			gestureDetector = new GestureDetector(getContext(), this);
-	}	  
-
-	  @Override
-	  public Parcelable onSaveInstanceState() {
-
-	    Bundle bundle = new Bundle();
-	    bundle.putParcelable("instanceState", super.onSaveInstanceState());
-	    bundle.putInt("stateToSave", this.stateToSave);
-	    bundle.putFloat("mAngle", mAngle);
-	    bundle.putBoolean("mState", mState);
-	    // ... save everything
-	    return bundle;
-	  }
-
-	  @Override
-	  public void onRestoreInstanceState(Parcelable state) {
-
-	    if (state instanceof Bundle) {
-	      Bundle bundle = (Bundle) state;
-	      this.stateToSave = bundle.getInt("stateToSave");
-	      this.mAngle = bundle.getFloat("mAngle");
-	      this.mState = bundle.getBoolean("mState");
-	      // ... load everything
-	      state = bundle.getParcelable("instanceState");
-	    }
-	    super.onRestoreInstanceState(state);
-	  }
 	
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -153,7 +155,12 @@ public class UIKnob extends View implements OnGestureListener {
 	}	
 
 	@Override
-	protected void onDraw(Canvas canvas) {	    
+	protected void onDraw(Canvas canvas) {
+	    int left = getPaddingLeft();
+	    int top = getPaddingTop();
+	    int right = getWidth() - getPaddingRight();
+	    int bottom = getHeight() - getPaddingBottom();
+	    
 		canvas.drawBitmap(background, 0, 0, tiBitmapPaint);
 		if(stator != null)
 			canvas.drawBitmap(stator, scale_matrix, tiBitmapPaint);		
@@ -169,6 +176,47 @@ public class UIKnob extends View implements OnGestureListener {
 		}*/
 	}		
 
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+	    int desiredWidth = 100;
+	    int desiredHeight = 100;
+
+	    int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+	    int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+	    int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+	    int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+	    int width;
+	    int height;
+
+	    //Measure Width
+	    if (widthMode == MeasureSpec.EXACTLY) {
+	        //Must be this size
+	        width = widthSize;
+	    } else if (widthMode == MeasureSpec.AT_MOST) {
+	        //Can't be bigger than...
+	        width = Math.min(desiredWidth, widthSize);
+	    } else {
+	        //Be whatever you want
+	        width = desiredWidth;
+	    }
+
+	    //Measure Height
+	    if (heightMode == MeasureSpec.EXACTLY) {
+	        //Must be this size
+	        height = heightSize;
+	    } else if (heightMode == MeasureSpec.AT_MOST) {
+	        //Can't be bigger than...
+	        height = Math.min(desiredHeight, heightSize);
+	    } else {
+	        //Be whatever you want
+	        height = desiredHeight;
+	    }
+
+	    //MUST CALL THIS
+	    setMeasuredDimension(width, height);
+	}	
+	
 	/**
 	 * math..
 	 * @param x
@@ -178,35 +226,6 @@ public class UIKnob extends View implements OnGestureListener {
 	private float cartesianToPolar(float x, float y) {
 		return (float) -Math.toDegrees(Math.atan2(x - 0.5f, y - 0.5f));
 	}
-	
-	@Override public boolean onTouchEvent(MotionEvent event) {
-		if (gestureDetector.onTouchEvent(event)) return true;
-		else return super.onTouchEvent(event);
-	}	
-	public boolean onDown(MotionEvent event) {
-		if(enabled){
-			float x = event.getX() / ((float) getWidth());
-			float y = event.getY() / ((float) getHeight());
-			mAngleDown = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
-		}
-		return true;
-	}
-	
-	public boolean onSingleTapUp(MotionEvent e) {
-		if(enabled){
-			float x = e.getX() / ((float) getWidth());
-			float y = e.getY() / ((float) getHeight());
-			mAngleUp = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
-			
-			// if we click up the same place where we clicked down, it's just a button press
-			//if (! Float.isNaN(mAngleDown) && ! Float.isNaN(mAngleUp) && Math.abs(mAngleUp-mAngleDown) < 10) {
-				SetState(!mState);
-				if (m_listener != null) m_listener.onStateChange(mState);
-			//}
-		}
-		return true;
-	}
-
 	public void setRotorPosAngle(float deg) {
 		if (deg >= 210 || deg <= 150) {
 			if (deg > 180) deg = deg - 360;	
@@ -229,6 +248,35 @@ public class UIKnob extends View implements OnGestureListener {
 		float posDegree = (float) ((mAngle / 3.0) + 150);
 		if (posDegree > 360) posDegree = posDegree - 360;
 		return posDegree;
+	}
+	
+	@Override public boolean onTouchEvent(MotionEvent event) {
+		if (gestureDetector.onTouchEvent(event)) return true;
+		else return super.onTouchEvent(event);
+	}
+	@Override
+	public boolean onDown(MotionEvent event) {
+		if(enabled){
+			float x = event.getX() / ((float) getWidth());
+			float y = event.getY() / ((float) getHeight());
+			mAngleDown = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
+		}
+		return true;
+	}
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		if(enabled){
+			float x = e.getX() / ((float) getWidth());
+			float y = e.getY() / ((float) getHeight());
+			mAngleUp = cartesianToPolar(1 - x, 1 - y);// 1- to correct our custom axis direction
+			
+			// if we click up the same place where we clicked down, it's just a button press
+			//if (! Float.isNaN(mAngleDown) && ! Float.isNaN(mAngleUp) && Math.abs(mAngleUp-mAngleDown) < 10) {
+				SetState(!mState);
+				if (m_listener != null) m_listener.onStateChange(mState);
+			//}
+		}
+		return true;
 	}	
 	@Override	
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
@@ -261,19 +309,14 @@ public class UIKnob extends View implements OnGestureListener {
 	@Override
 	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
 			float arg3) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void onLongPress(MotionEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onShowPress(MotionEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 }

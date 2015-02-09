@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="125dp"
-    android:layout_height="125dp"
-    android:orientation="vertical" >
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" xmlns:app="http://schemas.android.com/apk/res/com.bmt.ioio_demo">
+
+    <com.bmt.customviews.UIGraphView
+        android:id="@+id/uIGraphView1"
+        android:layout_width="fill_parent"
+        android:layout_height="150dp"
+        android:layout_margin="20dp" />
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -10,27 +16,37 @@
 
         <com.bmt.customviews.LED
             android:id="@+id/lED3"
-            android:layout_width="30dp"
-            android:layout_height="30dp" />
+            android:layout_width="60dp"
+            android:layout_height="60dp" />
 
         <com.bmt.customviews.LED
             android:id="@+id/lED2"
-            android:layout_width="30dp"
-            android:layout_height="30dp" />
+            android:layout_width="60dp"
+            android:layout_height="60dp" />
 
         <com.bmt.customviews.LED
             android:id="@+id/lED1"
-            android:layout_width="30dp"
-            android:layout_height="30dp" />
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:ison="true"
+            app:ledoff_color="#000033"
+            app:ledoff_image="@drawable/ledoff"
+            app:ledon_color="#0000FF"
+            app:ledon_image="@drawable/ledon" />
 
     </LinearLayout>
 
-    <com.bmt.customviews.UIKnob
-        android:layout_width="125dp"
-        android:layout_height="125dp" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="25dp" >
 
-    <com.bmt.customviews.UIKnobSwitch
-        android:layout_width="125dp"
-        android:layout_height="125dp" />
+        <com.bmt.customviews.UIKnob
+            android:layout_width="125dp"
+            android:layout_height="125dp" />
 
+        <com.bmt.customviews.UIKnobSwitch
+            android:layout_width="125dp"
+            android:layout_height="125dp" />
+    </LinearLayout>
 </LinearLayout>
