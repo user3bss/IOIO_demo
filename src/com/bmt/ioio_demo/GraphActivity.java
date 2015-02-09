@@ -55,8 +55,7 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
 			"PIN43",	//12
 			"PIN44",	//13
 			"PIN45",	//14
-			"PIN46",	//15
-			
+			"PIN46"		//15
 	};
 	
 	int [] pin_colors = {
@@ -71,14 +70,15 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
 			Color.parseColor("#00FFAA"),	//8
 			Color.parseColor("#00FFFF"),	//9
 			Color.parseColor("#00AAFF"),	//10
-			Color.parseColor("#0055FF"),	//12
-			Color.parseColor("#0000FF"),	//13
+			Color.parseColor("#0055FF"),	//11
+			Color.parseColor("#0000FF"),	//12
+			Color.parseColor("#AA00FF"),	//13
 			Color.parseColor("#5500FF"),	//14
-			Color.parseColor("#AA00FF")		//15
+			Color.parseColor("#AA0055")		//15
 	};
 	boolean[] enabled_channels = {
 			false,	//0
-			false,	//1
+			true,	//1
 			false,	//2
 			false,	//3
 			false,	//4
@@ -88,6 +88,7 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
 			false,	//8
 			false,	//9
 			false,	//10
+			false,	//11
 			false,	//12
 			false,	//13
 			false,	//14
@@ -140,7 +141,7 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.graph_activity);
 
-		Application app = getApplication();
+		//Application app = getApplication();
 		
 		Util u = new Util();
 		sizeOfFloat = u.sizeOfFloat();	  //4
@@ -180,10 +181,13 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
 		toggleButtons[14].setTag(new Integer(14));
 		toggleButtons[15] = (ToggleButton) findViewById(R.id.toggleButton16);		
 		toggleButtons[15].setTag(new Integer(15));
-		/*for(int i=0;i<16;i++){
+		for(int i=0;i<toggleButtons.length;i++){
 			toggleButtons[i].setOnClickListener(this);
-			files[i] = new FileIO(app, FileIO.file_location.APPTEMP, FileIO.file_mode.READWRITE, "PIN"+(i+31));
-		}*/
+			if(enabled_channels[i]){
+				toggleButtons[i].setChecked(true);
+			}
+			//files[i] = new FileIO(app, FileIO.file_location.APPTEMP, FileIO.file_mode.READWRITE, "PIN"+(i+31));
+		}
 		//clearFiles();
 		
 		/*sw_knob0 = (UIKnobSwitch) findViewById(R.id.sw_knob0);
@@ -194,8 +198,13 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
 			}			
 		});*/		
 		graph0 = (UIGraphView) findViewById(R.id.graph0);
-		graph0.setFilesAndColors(getApplication(), fileNames, pin_colors);		
-	}	
+		graph0.setFilesAndColors(getApplication(), fileNames, pin_colors);	
+	}
+	@Override
+	protected void onStart(){
+		super.onStart();
+		//graph0.filesUpdated(enabled_channels);
+	}
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -272,8 +281,8 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
 				led.writeBit(false); 										   //led is inverted
 				//InputPin InputPin9 = new InputPin(ioio_, 9, 0); 			   //0:pullup, 1:pulldn, 2:float
 				PwmOutput pwmOutput_ = ioio_.openPwmOutput(12, 50);
-				float sr = AnalogPinFiles[0].getIOIO_Pin().getSampleRate();
-				toast("Analog Sample Rate: "+sr);
+				//float sr = AnalogPinFiles[0].getIOIO_Pin().getSampleRate();
+				//toast("Analog Sample Rate: "+sr);
 				toast("50% duty cycle on pin #12");
 			} catch (Exception e) {
 				toast("setup_Error: "+e.getMessage()+" "+e.getLocalizedMessage());
@@ -297,8 +306,9 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
 		public void loop() {		
 			try {
 				//read the analog pins
-				for(int i=0;i<16;i++){				
-					AnalogPinFiles[i].readAnalogInBufferedToFile();
+				for(int i=0;i<16;i++){
+					if(enabled_channels[i])
+						AnalogPinFiles[i].readAnalogInBufferedToFile();
 				}
 				runOnUiThread(new Runnable() {
 					@Override
@@ -319,11 +329,11 @@ public class GraphActivity extends IOIOActivity implements OnClickListener{
         Log.i(tag, "-- ON STOP -- : closing files");
         try{
 	        graph0.closeFiles();
-	        if(AnalogPinFiles != null){
+	        /*if(AnalogPinFiles != null){
 				for(int i=0;i<16;i++){
 					AnalogPinFiles[i].closeFile();
 				}
-	        }
+	        }*/
         } catch(Exception e){
         	Log.e(tag, e.getLocalizedMessage());
         }

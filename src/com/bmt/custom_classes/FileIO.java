@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 import android.app.Application;
 import android.os.Environment;
@@ -18,13 +19,14 @@ public class FileIO {
 	    APPTEMP, APPDATA, EXTSTORAGE, APPRESOURCES
 	}
 	public enum file_mode {
-		READ, WRITE, READWRITE
+		READ, WRITE, READWRITE, RANDOMRW
 	}
 	file_mode fmode;
 	file_location flocation;
 	String fname = null;
 	private String path = null;
 	File _file = null;
+	RandomAccessFile fRandomRW = null;
 	FileOutputStream fOStream = null;
 	FileInputStream fIStream = null;
 	
@@ -110,6 +112,9 @@ public class FileIO {
 	public FileOutputStream getOutputStream(){
 		return fOStream;
 	}
+	public RandomAccessFile getRandomRWFile(){
+		return fRandomRW;
+	}	
 	private void createFileIfNotExist(){
 		if(!_file.exists()){
 			Log.i(tag, "creating file: "+path+fname);
@@ -120,6 +125,16 @@ public class FileIO {
 			}
 		}
 		//Log.i(tag, "File Length: "+_file.length());		
+	}
+	private boolean openRandomRW(){
+		boolean openError = false;
+		try {
+			fRandomRW = new RandomAccessFile(_file, "rw");
+		} catch (FileNotFoundException e) {
+			Log.e(tag, "ERROR opening file for RandomRW: "+e.getLocalizedMessage()+ ", file:"+path+fname);
+			openError = true;
+		}
+		return openError;
 	}
 	private boolean openOutputStream(){
 		boolean openError = false;
@@ -140,6 +155,16 @@ public class FileIO {
 			openError = true;
 		}
 		return openError;
+	}
+	private void closeRandomRW(){
+		if(fRandomRW != null){
+			try {
+				fRandomRW.close();
+				fRandomRW = null;
+			} catch (IOException e) {
+				Log.e(tag, "ERROR: "+e.getLocalizedMessage());
+			}
+		}
 	}
 	private void closeInputStream(){
 		if(fIStream != null){
@@ -180,6 +205,9 @@ public class FileIO {
 				case READWRITE:
 					openError = openInputStream() & openOutputStream();
 					break;
+				case RANDOMRW:
+					openError = openRandomRW();
+					break;
 			}
 		}
 		return openError;
@@ -197,93 +225,173 @@ public class FileIO {
 					closeInputStream();
 					closeOutputStream();
 					break;
+				case RANDOMRW:
+					closeRandomRW();
+					break;
 			}
 		}
 	}
-	public boolean writeByte(int b){
-		boolean didWriteData = false;
-		if(_file.canWrite() && fOStream != null){				
+	public long seek(long offset){
+		long byteskipped = 0;
+		if(fmode == file_mode.READ || fmode == file_mode.READWRITE){
+			if(fIStream != null){				
+				try {
+					byteskipped = fIStream.skip(offset);
+				} catch (IOException e) {
+					Log.d(tag, "Error: "+e.getLocalizedMessage());
+				}
+			}			
+		} else if(fRandomRW != null){
 			try {
-				fOStream.write(b);
+				//Moves this file's file pointer to a new position, from where following read, 
+				//write or skip operations are done. The position may be greater 
+				//than the current length of the file, but the file's length will only change 
+				//if the moving of the pointer is followed by a write operation.
+				//
+				//this method returns void
+				 fRandomRW.seek(offset);
 			} catch (IOException e) {
-				Log.e(tag, "Error: "+e.getMessage());
+				Log.e(tag, "Error: "+e.getLocalizedMessage());
 			}
-			didWriteData = true;
-		} else {
-			Log.e(tag, "file is READONLY: "+_file.getAbsolutePath());
+		}
+		return byteskipped;
+	}
+	public boolean writeInt(int b){
+		boolean didWriteData = false;
+		if(fmode != file_mode.RANDOMRW){
+			if(_file.canWrite() && fOStream != null){				
+				try {
+					fOStream.write(b);
+				} catch (IOException e) {
+					Log.e(tag, "Error: "+e.getLocalizedMessage());
+				}
+				didWriteData = true;
+			} else {
+				Log.e(tag, "file is READONLY: "+_file.getAbsolutePath());
+			}
+		} else if(fRandomRW != null){
+			try {
+				fRandomRW.writeByte(b);
+				didWriteData = true;
+			} catch (IOException e) {
+				Log.e(tag, "Error: "+e.getLocalizedMessage());
+			}
 		}
 		return didWriteData;
 	}	
 	public boolean writeByteBuffer(byte[] buffer){
 		boolean didWriteData = false;
-		if(_file.canWrite() && fOStream != null){				
-			try {
-				fOStream.write(buffer);
-			} catch (IOException e) {
-				Log.e(tag, "Error: "+e.getMessage());
+		if(fmode != file_mode.RANDOMRW){
+			if(_file.canWrite() && fOStream != null){				
+				try {
+					fOStream.write(buffer);
+				} catch (IOException e) {
+					Log.e(tag, "Error: "+e.getLocalizedMessage());
+				}
+				didWriteData = true;
+			} else {
+				Log.e(tag, "file is READONLY: "+_file.getAbsolutePath());
 			}
-			didWriteData = true;
-		} else {
-			Log.e(tag, "file is READONLY: "+_file.getAbsolutePath());
+		} else if(fRandomRW != null){
+			try {
+				fRandomRW.write(buffer);
+				didWriteData = true;
+			} catch (IOException e) {
+				Log.e(tag, "Error: "+e.getLocalizedMessage());
+			}
 		}
 		return didWriteData;
 	}
 	public boolean writeByteBuffer(byte[] buffer, int byteOffset, int byteCount){
 		boolean didWriteData = false;
-		if(_file.canWrite() && fOStream != null){				
-			try {
-				fOStream.write(buffer, byteOffset, byteCount);
-			} catch (IOException e) {
-				Log.e(tag, "Error: "+e.getMessage());
+		if(fmode != file_mode.RANDOMRW){		
+			if(_file.canWrite() && fOStream != null){				
+				try {
+					fOStream.write(buffer, byteOffset, byteCount);
+				} catch (IOException e) {
+					Log.e(tag, "Error: "+e.getLocalizedMessage());
+				}
+				didWriteData = true;
+			} else {
+				Log.e(tag, "file is READONLY: "+_file.getAbsolutePath());
 			}
-			didWriteData = true;
-		} else {
-			Log.e(tag, "file is READONLY: "+_file.getAbsolutePath());
+		} else if(fRandomRW != null){
+			try {
+				fRandomRW.write(buffer, byteOffset, byteCount);
+				didWriteData = true;
+			} catch (IOException e) {
+				Log.e(tag, "Error: "+e.getLocalizedMessage());
+			}
 		}
 		return didWriteData;
 	}	
-	public byte[] readByteBuffer(){
-		byte[] buffer = null;
-		if(_file.canRead() && fIStream != null){				
-			try {
-				fIStream.read(buffer);
-			} catch (IOException e) {
-				Log.d(tag, "Error: "+e.getMessage());
+	public int readByteBuffer(byte[] buffer){
+		int bytesRead = 0;
+		if(fmode != file_mode.RANDOMRW){		
+			if(_file.canRead() && fIStream != null){				
+				try {
+					bytesRead = fIStream.read(buffer);
+				} catch (IOException e) {
+					Log.d(tag, "Error: "+e.getLocalizedMessage());
+				}
+			} else {
+				Log.d(tag, "can't read file: "+_file.getAbsolutePath());
 			}
-		} else {
-			Log.d(tag, "can't read file: "+_file.getAbsolutePath());
+		} else if(fRandomRW != null){
+			try {
+				bytesRead = fRandomRW.read(buffer);
+			} catch (IOException e) {
+				Log.e(tag, "Error: "+e.getLocalizedMessage());
+			}
 		}
-		return buffer;
+		return bytesRead;
 	}
-	public byte[] readByteBuffer(int byteOffset, int byteCount){
-		byte[] buffer = null;
-		if(_file.canRead() && fIStream != null){				
-			try {
-				fIStream.read(buffer, byteOffset, byteCount);
-			} catch (IOException e) {
-				Log.d(tag, "Error: "+e.getMessage());
+	public int readByteBuffer(byte[] buffer, int byteOffset, int byteCount){
+		int bytesRead = 0;
+		if(fmode != file_mode.RANDOMRW){
+			if(_file.canRead() && fIStream != null){				
+				try {
+					bytesRead = fIStream.read(buffer, byteOffset, byteCount);
+				} catch (IOException e) {
+					Log.d(tag, "Error: "+e.getLocalizedMessage());
+				}
+			} else {
+				Log.d(tag, "can't read file: "+_file.getAbsolutePath());
 			}
-		} else {
-			Log.d(tag, "can't read file: "+_file.getAbsolutePath());
-		}
-		return buffer;
+		} else if(fRandomRW != null){
+			try {
+				bytesRead = fRandomRW.read(buffer, byteOffset, byteCount);
+			} catch (IOException e) {
+				Log.e(tag, "Error: "+e.getLocalizedMessage());
+			}
+		}			
+		return bytesRead;
 	}
 	
-	public int readByte(){
+	public int readInt(){
 		int b = -2^31;
-		if(_file.canRead() && fIStream != null){				
-			try {
-				b = fIStream.read();
-			} catch (IOException e) {
-				Log.d(tag, "Error: "+e.getMessage());
+		if(fmode != file_mode.RANDOMRW){
+			if(_file.canRead() && fIStream != null){				
+				try {
+					b = fIStream.read();
+				} catch (IOException e) {
+					Log.d(tag, "Error: "+e.getLocalizedMessage());
+				}
+			} else {
+				Log.d(tag, "can't read file: "+_file.getAbsolutePath());
 			}
-		} else {
-			Log.d(tag, "can't read file: "+_file.getAbsolutePath());
+		} else if(fRandomRW != null){
+			try {
+				b = fRandomRW.read();
+			} catch (IOException e) {
+				Log.d(tag, "Error: "+e.getLocalizedMessage());
+			}
 		}
 		return b;
-	}	
+	}
 	
 	public long fileLength(){
+		//_file.getInputStream().available() == _file.fileLength()
 		return _file.length();
 	}
 	public void printDir(){

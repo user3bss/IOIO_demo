@@ -6,7 +6,6 @@
 
 package com.bmt.customviews;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -27,6 +27,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bmt.custom_classes.FileIO;
+import com.bmt.custom_classes.MathChart;
 import com.bmt.custom_classes.Util;
 import com.bmt.custom_classes.line_chart;
 import com.bmt.ioio_demo.R;
@@ -46,10 +47,9 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 	protected int leftOffset = 75;
 	protected int textLeftPadding = 20;
 	//private boolean isScrolling = false;
-	
+	Util u = null;
 	FileIO[] files = null;
 	private int[] colors = null;
-	private int numGraphPointsXaxis = 0;
 	int sizeOfFloat = 0;
 	
 	Context c = null;
@@ -65,7 +65,7 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 	            }
 	        });
 		}
-		Util u = new Util();
+		u = new Util();
 		sizeOfFloat = u.sizeOfFloat();
 	}
 	public UIGraphView(Context _c) {
@@ -87,18 +87,23 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 		setPaintOptions(_c, attrs);
 		init();
 	}
-	public void setFilesAndColors(Application app, String[] _fileNames, int[] _colors){		
-		colors = _colors;
-		files = new FileIO[_colors.length];
-		for(int i=0;i<_colors.length;i++){
-			files[i] = new FileIO(app, FileIO.file_location.APPTEMP, FileIO.file_mode.READ, _fileNames[i]);
+	public void setFilesAndColors(Application app, String[] _fileNames, int[] _colors){
+		//Log.i(tag, "setFilesAndColors");
+		if(_fileNames.length == _colors.length){
+			colors = _colors;
+			//Log.i(tag, "Creating FileInPutStreams");
+			files = new FileIO[_fileNames.length];
+			for(int i=0;i<_fileNames.length;i++){
+				files[i] = new FileIO(app, FileIO.file_location.APPTEMP, FileIO.file_mode.READ, _fileNames[i]);
+			}
 		}
 	}
 	public void closeFiles(){
-		for(int i=0;i<colors.length;i++){
+		for(int i=0;i<files.length;i++){
 			files[i].closeFile();
 		}		
 	}
+	
 	public void filesUpdated(boolean[] enabled_channels){
 		//if scroll is at end of data display the new data coming in.
 		//Log.i(tag, "numGraphPointsXaxis: "+numGraphPointsXaxis);
@@ -108,46 +113,59 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 		//TODO need to filter samples according to scroll here??		
 		//graph0.drawLineChart(p.getSamples(), color); //convert arraylist<float> to float[] 
 		//TODO use paging for render frames???
-		
-		//Clear Graph
-		background_bitmap.eraseColor(Color.TRANSPARENT);	//don't want to erase backgroundImage, commenting doesn't erase anything
-		tiCanvas.drawPath(border_path, border_paint);
-		drawGraphLines(4, 4, leftOffset, 0); //have to draw text labels too	
-		
+
+		DisplayMetrics metrics = getResources().getDisplayMetrics();
+		int numGraphPointsXaxis = metrics.widthPixels - leftOffset; //949+75 = 1024		
+		Log.i(tag, "numGraphPointsXaxis: "+numGraphPointsXaxis+" density: "+metrics.densityDpi);
 		try{
-			if(files != null && numGraphPointsXaxis > 0 && colors.length >= files.length){
-				for(int i =0;i< files.length;i++){
-					long fl = files[i].fileLength();
-					byte[] buffer = new byte[numGraphPointsXaxis * sizeOfFloat];
-					int byteOffset = (int) fl - (numGraphPointsXaxis * sizeOfFloat);	//4 bytes for each float
-					/*if(byteOffset < (numGraphPointsXaxis * sizeOfFloat)){
-						break;
-					}*/
-					//Log.i(tag, "File Length: "+fl + " buffer length" + buffer.length+ " offset: "+byteOffset);
-					try {
-						int numBytesRead = files[i].getInputStream().read(buffer, byteOffset, (numGraphPointsXaxis * sizeOfFloat));
+			if(files != null && numGraphPointsXaxis > 0 && colors.length == files.length && files.length == enabled_channels.length){
+				for(int i =0;i<files.length;i++){
+					if(enabled_channels[i]){	//use enabled_channels to graph selected channels
+						Log.i(tag, "Plotting channel: "+i);
+						long fl = files[i].fileLength();
+						byte[] buffer = new byte[numGraphPointsXaxis * sizeOfFloat];
+						int byteOffset = (int) fl - (numGraphPointsXaxis * sizeOfFloat);	//4 bytes for each float
+						/*if(byteOffset < (numGraphPointsXaxis * sizeOfFloat)){
+							break;
+						}*/
+						Log.i(tag, "numGraphPointsXaxis: "+numGraphPointsXaxis);
+						Log.i(tag, "File Length: "+fl + ", buffer length:" + buffer.length+ ", offset: "+byteOffset);
+						long position = files[i].seek(byteOffset);
+						int numBytesRead = files[i].readByteBuffer(buffer);
+						Log.i(tag, "position: "+position+", numbytesread: "+numBytesRead);
+						
 						//convert byte[] to float[]
 						FloatBuffer fb = ByteBuffer.wrap(buffer).asFloatBuffer();
 						float[] f = new float[fb.capacity()];
 						fb.get(f); 					// Copy the contents of the FloatBuffer into dst						
-
-						/*if(numBytesRead > 0){
-						    //use enabled_channels to graph selected channels
-							Log.i(tag, "numGraphPointsXaxis: "+numGraphPointsXaxis+" f.length"+f.length);
-							//drawLineChart(fArray, colors[i]);						
-							line_chart lc = new line_chart();
-							lc._BitmapPaint.setColor(colors[i]);
-							lc.drawValues(tiCanvas, f, leftOffset);		
-						}*/
-					} catch (IOException e) {
-						Toast.makeText(c, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+						Log.i(tag, "f.length: "+f.length);
+						
+						//if(f.length > 0){
+							//drawGraphLines(4, 4, leftOffset, 0); //have to draw text labels too
+							//drawLineChart(f, colors[i]);
+						//}
+						/*background_bitmap.eraseColor(Color.TRANSPARENT);	//don't want to erase backgroundImage, commenting doesn't erase anything
+						tiCanvas.drawPath(border_path, border_paint);
+						drawGraphLines(4, 4, leftOffset, 0); //have to draw text labels too
+						float[] v = new float[metrics.widthPixels-leftOffset];
+						float[] sq = new float[metrics.widthPixels-leftOffset];
+						float[] t = new float[metrics.widthPixels-leftOffset];
+						float[] s = new float[metrics.widthPixels-leftOffset];
+						for(int i1=0;i1<metrics.widthPixels-leftOffset;i1++){
+							v[i1] = (float) (1.65 * Math.sin(i1*0.05) + 1.65); //.017 rad = 1 deg
+							sq[i1] = (float) (Math.signum( Math.sin(2*Math.PI*i1*0.005))+1.65);
+							t[i1] = Math.abs(v[i1]);
+						}
+						drawLineChart(v, Color.RED);
+						drawLineChart(t, Color.GREEN);
+						drawLineChart(sq, Color.CYAN);						
+						invalidate();*/
 					}
 				}
 			}
 		} catch (Exception e) {
 			Toast.makeText(c, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-		}
-		//invalidate(); //draw to screen
+		}		
 	}
 	/*public interface UIGraphViewListener {
 		public void onScrollUpdate(float x, float y, float xScroll, float yScroll);
@@ -266,8 +284,6 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 			graph_lines_path.lineTo(width, ((i+1)*divisor));			
 		}		
 		float divisorV = (width-leftOffset)/numlinesX;
-		numGraphPointsXaxis = width-leftOffset;
-		
 		for(int i=0;i<numlinesY-1;i++){
 			graph_lines_path.moveTo(leftOffset+((i+1)*divisorV), 0 );
 			graph_lines_path.lineTo(leftOffset+((i+1)*divisorV), tiCanvas.getHeight() );	
@@ -276,18 +292,11 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 		drawYAxisLabels( numlinesY, leftOffset, divisor, divisorV);		
 		//prepare and draw sine wave
 		if(isInEditMode()){
-			float[] v = new float[width-leftOffset];
-			float[] sq = new float[width-leftOffset];
-			float[] t = new float[width-leftOffset];
-			float[] s = new float[width-leftOffset];
-			for(int i=0;i<width-leftOffset;i++){
-				v[i] = (float) (1.65 * Math.sin(i*0.05) + 1.65); //.017 rad = 1 deg
-				sq[i] = (float) (Math.signum( Math.sin(2*Math.PI*i*0.005))+1.65);
-				t[i] = Math.abs(v[i]);
-			}
+			float[] v = MathChart.sinData(width-leftOffset, 1.65, 1.0);
 			drawLineChart(v, Color.RED);
+			
+			float[] t = MathChart.sqData(width-leftOffset, 1.65, .8);
 			drawLineChart(t, Color.GREEN);
-			drawLineChart(sq, Color.CYAN);
 		}
 	}
 	protected void draw_border(){
@@ -321,12 +330,12 @@ public class UIGraphView extends View implements GestureDetector.OnGestureListen
 	@Override
 	protected void onDraw(Canvas canvas) {
 		canvas.drawBitmap(background_bitmap, 0, 0, border_paint);
-		/*if (border_path != null){
+		if (border_path != null){
 			canvas.drawPath(border_path, border_paint);
 		}
 		if(graph_lines_path != null){
 			canvas.drawPath(graph_lines_path, graph_lines_paint);
-		}*/
+		}
 	}
 
 	public void clear() {
